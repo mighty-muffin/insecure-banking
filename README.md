@@ -6,8 +6,8 @@
 
    ```bash
    uv venv .venv --python 3.10
-   python src/manage.py migrate
-   python src/manage.py runserver
+   python manage.py migrate
+   python manage.py runserver
    ```
 
 2. You can then access the bank application here: <http://localhost:8000>

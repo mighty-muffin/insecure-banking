@@ -47,6 +47,7 @@ COPY --from=builder /app/.venv /app/.venv
 
 # Copy application code
 COPY src /app/src
+COPY manage.py /app/manage.py
 
 # Set ownership
 RUN chown -R appuser:appgroup /app
@@ -56,7 +57,7 @@ USER appuser
 EXPOSE 8000
 
 # Run migrations
-RUN python src/manage.py migrate
+RUN python manage.py migrate
 
 ENTRYPOINT ["tini", "--"]
-CMD ["python", "src/manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

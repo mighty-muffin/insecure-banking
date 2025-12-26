@@ -15,7 +15,7 @@ from web.models import (
 
 
 class StorageService:
-    folder = os.path.join(settings.BASE_DIR, "web", "static", "resources", "avatars")
+    folder = os.path.join(settings.BASE_DIR, "src", "web", "static", "resources", "avatars")
 
     def exists(self, file_name: str) -> bool:
         file = os.path.join(self.folder, file_name)
