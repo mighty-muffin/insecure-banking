@@ -67,4 +67,3 @@ class TestVersionInfoContextProcessor:
         mock_subprocess.return_value = b'git@github.com:owner/repo.git\n'
         result = get_repo_url()
         assert result == 'https://github.com/owner/repo'
-
