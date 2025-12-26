@@ -150,22 +150,26 @@ jobs:
           exit 1
         shell: bash
 
-  docker:
+  docker-build:
     needs:
       - build
       - scan
       - secret
-    name: Docker Build & Scan
-    runs-on: ubuntu-24.04
+    name: Docker Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            platform: linux/amd64
+          - os: ubuntu-24.04-arm
+            platform: linux/arm64
     timeout-minutes: 15
 
     steps:
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-
-      - name: Set up QEMU
-        id: qemu
-        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
 
       - name: Set up Docker Buildx
         id: buildx
@@ -199,20 +203,33 @@ jobs:
         id: build_image
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
-          platforms: |
-            linux/amd64
+          platforms: ${{ matrix.platform }}
           context: .
           file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          push: true
-          tags: ${{ steps.docker_meta.outputs.tags }}
+          outputs: type=image,name=ghcr.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
           labels: ${{ steps.docker_meta.outputs.labels }}
           build-args: |
             BUILDKIT_INLINE_CACHE=1
             GIT_COMMIT=${{ github.sha }}
             REPO_URL=${{ github.server_url }}/${{ github.repository }}
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build_image.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+        shell: bash
+
+      - name: Upload digest
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        with:
+          name: digests-${{ matrix.platform }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
 
       - name: Run Container Scan
         id: container
@@ -227,6 +244,56 @@ jobs:
           exit 1
         shell: bash
 
+  docker-merge:
+    needs:
+      - docker-build
+    name: Docker Merge & Push
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      image-tag: ${{ steps.image-tag.outputs.image-tag }}
+
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          pattern: digests-*
+          merge-multiple: true
+          path: /tmp/digests
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+
+      - name: Login to GHCR
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        id: docker_meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+          flavor: |
+            latest=auto
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}},priority=100
+            type=ref,event=branch,priority=100
+            type=raw,value=gha-${{ github.run_id }},enable=${{github.event_name == 'pull_request'}},priority=200
+            type=raw,value=nightly-${{ github.run_id }},enable=${{github.event_name == 'schedule'}},priority=200
+            type=ref,event=pr,priority=200
+            type=ref,event=tag,priority=200
+            type=sha,value={{sha}},enable={{is_default_branch}},priority=300
+
+      - name: Create manifest list and push
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf 'ghcr.io/${{ github.repository }}@sha256:%s ' *)
+
       - name: Find the primary image tag we just pushed, and output it
         id: image-tag
         run: |
@@ -236,7 +303,7 @@ jobs:
   gating:
     needs:
       - build
-      - docker
+      - docker-merge
     name: Gating
     runs-on: ubuntu-24.04
     timeout-minutes: 5
