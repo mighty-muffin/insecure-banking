@@ -1,0 +1,70 @@
+[project]
+name = "insecure-python"
+version = "0.2.4"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "asgiref==3.7.2",
+    "django==4.2.4",
+    "pycryptodome==3.18.0",
+    "sqlparse==0.4.4",
+    "typing-extensions==4.7.1",
+]
+
+
+[dependency-groups]
+dev = [
+    "build==0.10.0",
+    "click==8.1.6",
+    "packaging==23.1",
+    "pathspec==0.11.2",
+    "pip-tools==7.2.0",
+    "platformdirs==3.10.0",
+    "pyproject-hooks==1.0.0",
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "pytest-django>=4.11.1",
+    "pytest-mock>=3.15.1",
+    "tomli==2.0.1",
+    "wheel==0.41.0",
+]
+
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.2.4"
+tag_format = "v$version"
+version_files = [
+    "pyproject.toml:version",
+]
+
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.test_settings"
+python_paths = ["src"]
+testpaths = ["tests"]
+pythonpath = "src"
+addopts = [
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html:tests/coverage/html",
+    "--cov-report=xml:tests/coverage/coverage.xml",
+    "--cov-fail-under=80",
+    "--strict-markers",
+    "--verbose",
+]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "security: Security-focused tests",
+    "slow: Slow-running tests",
+]
+filterwarnings = [
+    "ignore::django.utils.deprecation.RemovedInDjango50Warning",
+    "ignore::DeprecationWarning",
+]
+
+
+[tool.setuptools]
+py-modules = []
