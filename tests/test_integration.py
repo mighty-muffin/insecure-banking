@@ -145,7 +145,8 @@ def test_pytest_configuration():
     assert settings.configured
 
     # Verify test settings
-    assert ':memory:' in str(settings.DATABASES['default']['NAME'])
+    db_name = str(settings.DATABASES['default']['NAME'])
+    assert ':memory:' in db_name or 'mode=memory' in db_name
 
     # Verify pytest markers are available
     assert hasattr(pytest, 'mark')

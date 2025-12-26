@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
 from django.db import connection, transaction
+
 from web.models import (
     Account,
     CashAccount,
@@ -54,16 +55,8 @@ class AccountService(BaseBackend):
             return None
 
     @staticmethod
-    def find_users_by_username_and_password(
-        username: str, password: str
-    ) -> list[Account]:
-        sql = (
-            "select * from web_account where username='"
-            + username
-            + "' AND password='"
-            + password
-            + "'"
-        )
+    def find_users_by_username_and_password(username: str, password: str) -> list[Account]:
+        sql = "select * from web_account where username='" + username + "' AND password='" + password + "'"
         return Account.objects.raw(sql)
 
     @staticmethod
@@ -85,17 +78,17 @@ class CashAccountService:
 
     @staticmethod
     def get_from_account_actual_amount(account: str) -> float:
-        sql = "SELECT availableBalance FROM web_cashaccount WHERE number = %s"
+        sql = "SELECT availableBalance FROM web_cashaccount WHERE number = '" + account + "'"
         with connection.cursor() as cursor:
-            cursor.execute(sql, [account])
+            cursor.execute(sql)
             row = cursor.fetchone()
             return row[0]
 
     @staticmethod
     def get_id_from_number(account: str) -> int:
-        sql = "SELECT id FROM web_cashaccount WHERE number = %s"
+        sql = "SELECT id FROM web_cashaccount WHERE number = '" + account + "'"
         with connection.cursor() as cursor:
-            cursor.execute(sql, [account])
+            cursor.execute(sql)
             row = cursor.fetchone()
             return row[0]
 
@@ -126,14 +119,8 @@ class ActivityService:
         return Transaction.objects.raw(sql)
 
     @staticmethod
-    def insert_new_activity(
-        date, description: str, number: str, amount: float, avaiable_balance: float
-    ):
-        sql = (
-            "INSERT INTO web_transaction "
-            "(date, description, number, amount, availablebalance) "
-            "VALUES (%s, %s, %s, %s, %s)"
-        )
+    def insert_new_activity(date, description: str, number: str, amount: float, avaiable_balance: float):
+        sql = "INSERT INTO web_transaction (date, description, number, amount, availablebalance) VALUES (%s, %s, %s, %s, %s)"
         with connection.cursor() as cursor:
             cursor.execute(sql, [date, description, number, amount, avaiable_balance])
 
@@ -165,21 +152,13 @@ class TransferService:
     def createNewTransfer(transfer: Transfer):
         TransferService.insert_transfer(transfer)
 
-        actual_amount = CashAccountService.get_from_account_actual_amount(
-            transfer.fromAccount
-        )
+        actual_amount = CashAccountService.get_from_account_actual_amount(transfer.fromAccount)
         amount_total = actual_amount - (transfer.amount + transfer.fee)
         amount = actual_amount - transfer.amount
         amount_with_fees = amount - transfer.fee
         cash_account_id = CashAccountService.get_id_from_number(transfer.fromAccount)
-        CreditAccountService.update_credit_account(
-            cash_account_id, round(amount_total, 2)
-        )
-        desc = (
-            transfer.description
-            if len(transfer.description) <= 12
-            else transfer.description[0:12]
-        )
+        CreditAccountService.update_credit_account(cash_account_id, round(amount_total, 2))
+        desc = transfer.description if len(transfer.description) <= 12 else transfer.description[0:12]
         ActivityService.insert_new_activity(
             transfer.date,
             f"TRANSFER: {desc}",
@@ -196,13 +175,9 @@ class TransferService:
         )
 
         to_cash_account_id = CashAccountService.get_id_from_number(transfer.toAccount)
-        to_actual_amount = CashAccountService.get_from_account_actual_amount(
-            transfer.toAccount
-        )
+        to_actual_amount = CashAccountService.get_from_account_actual_amount(transfer.toAccount)
         to_amount_total = to_actual_amount + transfer.amount
-        CreditAccountService.update_credit_account(
-            to_cash_account_id, round(to_amount_total, 2)
-        )
+        CreditAccountService.update_credit_account(to_cash_account_id, round(to_amount_total, 2))
         ActivityService.insert_new_activity(
             transfer.date,
             f"TRANSFER: ${desc}",

@@ -29,6 +29,35 @@ from django.test import TestCase
 from web.views import Untrusted, Trusted
 
 
+# Wrapper for os.system to allow mocking in tests
+def system_wrapper(command):
+    return os.system(command)
+
+
+# Base malicious class for obfuscation tests
+class ObfuscatedAttack:
+    def __init__(self, command="echo 'obfuscated attack'"):
+        self.command = command
+
+    def __reduce__(self):
+        return system_wrapper, (self.command,)
+
+
+# Session objects for manipulation tests
+class SessionData:
+    def __init__(self, user_id, permissions):
+        self.user_id = user_id
+        self.permissions = permissions
+
+class MaliciousSession(SessionData):
+    def __init__(self, user_id, permissions):
+        super().__init__(user_id, permissions)
+
+    def __reduce__(self):
+        # Escalate privileges during deserialization
+        return os.system, ("echo 'Session privilege escalation'",)
+
+
 @pytest.mark.security
 class TestDeserializationVulnerabilities(TestCase):
     """Security validation tests for deserialization vulnerabilities."""
@@ -277,21 +306,6 @@ class TestDeserializationVulnerabilities(TestCase):
         """
         # Simulate session objects that might be serialized
 
-        # Normal session object (safe)
-        class SessionData:
-            def __init__(self, user_id, permissions):
-                self.user_id = user_id
-                self.permissions = permissions
-
-        # Malicious session object
-        class MaliciousSession(SessionData):
-            def __init__(self, user_id, permissions):
-                super().__init__(user_id, permissions)
-
-            def __reduce__(self):
-                # Escalate privileges during deserialization
-                return os.system, ("echo 'Session privilege escalation'",)
-
         # Test normal session serialization
         normal_session = SessionData("user123", ["read", "write"])
         normal_serialized = pickle.dumps(normal_session)
@@ -425,14 +439,6 @@ class TestDeserializationVulnerabilities(TestCase):
         Educational Purpose: Demonstrates how attackers might obfuscate
         malicious pickle payloads to evade detection.
         """
-        # Base malicious class
-        class ObfuscatedAttack:
-            def __init__(self, command="echo 'obfuscated attack'"):
-                self.command = command
-
-            def __reduce__(self):
-                return os.system, (self.command,)
-
         # Different obfuscation techniques
         obfuscation_techniques = {
             "base64_encoded_command": ObfuscatedAttack("echo 'ZWNodyAnYXR0YWNrJw==' | base64 -d"),
@@ -458,15 +464,17 @@ class TestDeserializationVulnerabilities(TestCase):
                 }
 
                 # Test deserialization
-                with patch('os.system') as mock_system:
+                with patch('tests.security.test_deserialization.system_wrapper') as mock_system:
                     mock_system.return_value = 0
 
                     deserialized = pickle.loads(obfuscated_payload)
 
                     # Verify obfuscated attack works
-                    reduce_result = deserialized.__reduce__()
-                    self.assertEqual(reduce_result[0], os.system)
-                    self.assertEqual(reduce_result[1][0], attack_obj.command)
+                    # Since the payload executes system_wrapper during deserialization,
+                    # we verify that the mock was called with the expected command.
+                    mock_system.assert_called()
+                    args, _ = mock_system.call_args
+                    self.assertIn(attack_obj.command, args[0])
 
                 # Educational logging
                 print(f"OBFUSCATION TECHNIQUE: {technique_name}")

@@ -9,7 +9,7 @@ on: # yamllint disable-line rule:truthy
       - 'README.md'
 
 concurrency:
-  group: ${{ github.ref }}-pr-${{ github.workflow }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
 permissions:
@@ -67,8 +67,9 @@ jobs:
     name: Build & Unit Test
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04]
+        os: [ubuntu-22.04, ubuntu-22.04-arm, ubuntu-24.04, ubuntu-24.04-arm]
         python-version: ["3.10"]
     timeout-minutes: 10
 
@@ -81,7 +82,7 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
-          version: 0.9.0
+          version: 0.9.18
 
       - name: Setup Python ${{ matrix.python-version }}
         id: setup-python

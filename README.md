@@ -5,7 +5,7 @@
 1. Build and run the application:
 
    ```bash
-   uv venv --python 3.10
+   uv venv .venv --python 3.10
    python src/manage.py migrate
    python src/manage.py runserver
    ```

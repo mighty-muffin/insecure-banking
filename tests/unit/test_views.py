@@ -80,10 +80,10 @@ class ViewTestMixin:
 
         # Create test credit account
         self.credit_account = CreditAccount.objects.create(
+            cashAccountId=self.cash_account.id,
             number='9876543210',
             username='testuser',
             description='Test Credit Account',
-            balance=500.00,
             availableBalance=1500.00
         )
 
@@ -128,9 +128,11 @@ class TestLoginView(ViewTestMixin, TestCase):
         view.request = request
 
         response = view.get(request)
+        if hasattr(response, 'render'):
+            response.render()
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'login.html', response.content)
+        self.assertIn(b'Log in to your account', response.content)
 
     def test_login_view_template_name(self):
         """Test LoginView uses correct template."""
@@ -607,11 +609,9 @@ class TestAvatarUpdateView(ViewTestMixin, TestCase):
     def test_avatar_update_view_file_upload(self, mock_storage):
         """Test AvatarUpdateView file upload functionality."""
         # Create mock uploaded file
-        mock_file = Mock()
-        mock_file.file.read.return_value = b'image_data'
+        mock_file = SimpleUploadedFile("testuser.png", b'image_data')
 
-        request = self.create_authenticated_request('POST', '/avatar-update')
-        request.FILES = {'imageFile': mock_file}
+        request = self.create_authenticated_request('POST', '/avatar-update', {'imageFile': mock_file})
 
         view = AvatarUpdateView()
         view.request = request
@@ -708,7 +708,7 @@ class TestCertificateViews(ViewTestMixin, TestCase):
     def test_new_certificate_view_no_file(self):
         """Test NewCertificateView with no file uploaded."""
         request = self.create_authenticated_request('POST', '/new-certificate')
-        request.FILES = {}
+        # request.FILES is empty by default
 
         from web.views import NewCertificateView
         view = NewCertificateView()
@@ -726,13 +726,10 @@ class TestCertificateViews(ViewTestMixin, TestCase):
         from web.views import checksum
         checksum[0] = 'expected_checksum'
 
-        mock_file = Mock()
-        mock_file.file.read.return_value = b'malicious_pickle_data'
-        mock_file.__str__ = lambda x: 'malicious.pkl'
+        mock_file = SimpleUploadedFile("malicious.pkl", b'malicious_pickle_data')
         mock_checksum.return_value = 'expected_checksum'
 
-        request = self.create_authenticated_request('POST', '/new-certificate')
-        request.FILES = {'file': mock_file}
+        request = self.create_authenticated_request('POST', '/new-certificate', {'file': mock_file})
 
         from web.views import NewCertificateView
         view = NewCertificateView()
@@ -750,13 +747,10 @@ class TestCertificateViews(ViewTestMixin, TestCase):
         from web.views import checksum
         checksum[0] = 'expected_checksum'
 
-        mock_file = Mock()
-        mock_file.file.read.return_value = b'different_data'
-        mock_file.__str__ = lambda x: 'innocent.pkl'
+        mock_file = SimpleUploadedFile("innocent.pkl", b'different_data')
         mock_checksum.return_value = 'different_checksum'
 
-        request = self.create_authenticated_request('POST', '/new-certificate')
-        request.FILES = {'file': mock_file}
+        request = self.create_authenticated_request('POST', '/new-certificate', {'file': mock_file})
 
         from web.views import NewCertificateView
         view = NewCertificateView()
@@ -871,6 +865,139 @@ class TestTransferView(ViewTestMixin, TestCase):
 
         # Check cookie is set
         self.assertEqual(response.cookies['accountType'].value, 'Personal')
+
+    @patch('web.views.to_traces')
+    @patch('web.views.loader.get_template')
+    @patch('web.views.AccountService.find_users_by_username')
+    def test_transfer_view_post_personal_account(self, mock_find_users, mock_get_template, mock_to_traces):
+        """Test TransferView POST with Personal account type triggers check."""
+        mock_find_users.return_value = [self.account]
+        mock_template = Mock()
+        mock_template.render.return_value = 'rendered_template'
+        mock_get_template.return_value = mock_template
+
+        request = self.create_authenticated_request('POST', '/transfer')
+        request.COOKIES['accountType'] = 'Personal'
+        request.POST = {
+            'toAccount': '987654321',
+            'amount': '100.00',
+            'description': 'Test Transfer'
+        }
+        request.session = {}
+
+        view = TransferView()
+        view.request = request
+        response = view.post(request)
+
+        # Verify
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'rendered_template')
+        mock_to_traces.assert_called()
+        self.assertIn('pendingTransfer', request.session)
+        mock_get_template.assert_called_with('transferCheck.html')
+
+    @patch('web.views.TransferService.createNewTransfer')
+    @patch('web.views.to_traces')
+    @patch('web.views.loader.get_template')
+    @patch('web.views.AccountService.find_users_by_username')
+    @patch('web.views.CashAccountService.find_cash_accounts_by_username')
+    def test_transfer_view_post_other_account(self, mock_find_cash, mock_find_users, mock_get_template, mock_to_traces, mock_create_transfer):
+        """Test TransferView POST with non-Personal account type triggers confirmation."""
+        mock_find_users.return_value = [self.account]
+        mock_find_cash.return_value = [self.cash_account]
+        mock_template = Mock()
+        mock_template.render.return_value = 'rendered_template'
+        mock_get_template.return_value = mock_template
+
+        request = self.create_authenticated_request('POST', '/transfer')
+        request.COOKIES['accountType'] = 'Business'
+        request.POST = {
+            'toAccount': '987654321',
+            'amount': '100.00',
+            'description': 'Test Transfer'
+        }
+
+        view = TransferView()
+        view.request = request
+        response = view.post(request)
+
+        # Verify
+        self.assertEqual(response.status_code, 200)
+        mock_create_transfer.assert_called()
+        mock_get_template.assert_called_with('transferConfirmation.html')
+
+    @patch('web.views.TransferService.createNewTransfer')
+    @patch('web.views.loader.get_template')
+    @patch('web.views.AccountService.find_users_by_username')
+    @patch('web.views.CashAccountService.find_cash_accounts_by_username')
+    def test_transfer_view_post_confirm_action(self, mock_find_cash, mock_find_users, mock_get_template, mock_create_transfer):
+        """Test TransferView POST confirm action."""
+        mock_find_users.return_value = [self.account]
+        mock_find_cash.return_value = [self.cash_account]
+        mock_template = Mock()
+        mock_template.render.return_value = 'rendered_template'
+        mock_get_template.return_value = mock_template
+
+        request = self.create_authenticated_request('POST', '/transfer/confirm')
+        request.COOKIES['accountType'] = 'Personal'
+        request.POST = {'action': 'confirm'}
+
+        transfer_data = {
+            'toAccount': '987654321',
+            'amount': 100.00,
+            'description': 'Test Transfer',
+            'fee': 5.0,
+            'fromAccount': '123456789',
+            'sender': 'testuser'
+        }
+        request.session = {'pendingTransfer': json.dumps(transfer_data)}
+
+        view = TransferView()
+        view.request = request
+        response = view.post(request)
+
+        # Verify
+        self.assertEqual(response.status_code, 200)
+        mock_create_transfer.assert_called()
+        self.assertNotIn('pendingTransfer', request.session)
+
+    @patch('web.views.loader.get_template')
+    @patch('web.views.AccountService.find_users_by_username')
+    @patch('web.views.CashAccountService.find_cash_accounts_by_username')
+    def test_transfer_confirmation_zero_amount(self, mock_find_cash, mock_find_users, mock_get_template):
+        """Test transfer confirmation with zero amount shows error."""
+        mock_find_users.return_value = [self.account]
+        mock_find_cash.return_value = [self.cash_account]
+        mock_template = Mock()
+        mock_template.render.return_value = 'rendered_template'
+        mock_get_template.return_value = mock_template
+
+        request = self.create_authenticated_request('POST', '/transfer')
+        transfer = Transfer(amount=0.0)
+
+        view = TransferView()
+        view.request = request
+        response = view.transfer_confirmation(request, transfer, 'Personal')
+
+        # Verify
+        self.assertEqual(response.status_code, 200)
+        mock_get_template.assert_called_with('newTransfer.html')
+        # Verify context contains error
+        call_args = mock_template.render.call_args
+        self.assertTrue(call_args[0][0]['error'])
+
+    def test_transfer_view_post_confirm_redirect(self):
+        """Test TransferView POST confirm without pending transfer redirects."""
+        request = self.create_authenticated_request('POST', '/transfer/confirm')
+        request.POST = {'action': 'confirm'}
+        # No pendingTransfer in session
+
+        view = TransferView()
+        view.request = request
+        response = view.post(request)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/transfer')
 
 
 @pytest.mark.unit

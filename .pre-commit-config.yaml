@@ -12,6 +12,8 @@ default_stages:
 default_install_hook_types:
   - commit-msg
   - pre-commit
+default_language_version:
+  python: python3.10
 repos:
   - repo: meta
     hooks:
@@ -57,7 +59,9 @@ repos:
           - .config/.markdown-lint.yml
         exclude: |
           (?x)
+          ^.github/copilot-instructions.md|
           ^.github/instructions/.*|
+          ^.github/prompts/.*|
           ^CHANGELOG.md|
           ^README.md
   - repo: https://github.com/adrienverge/yamllint
@@ -94,32 +98,23 @@ repos:
           ^tests/.*
         stages:
           - manual
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.2
+  - repo: local
     hooks:
-      - id: pyupgrade
-        name: "python | code: run pyupgrade"
-        args:
-          - --py310
-        stages:
-          - manual
-  - repo: https://github.com/asottile/dead
-    rev: v2.1.0
-    hooks:
-      - id: dead
-        name: "python | code: check for dead"
-        exclude: |
-          (?x)
-          ^install/.*
-        stages:
-          - manual
+      - id: pytest
+        name: "python | test: run pytest"
+        entry: |
+          uv run pytest
+        language: system
+        types: [python]
+        pass_filenames: false
   - repo: local
     hooks:
       - id: pin-github-action
         name: "security | gh-action: pinned sha"
         verbose: true
         files: ^\.github/workflows/[^/]+\.ya?ml$
-        entry: "pin-github-action ."
+        entry: |
+          "pin-github-action ."
         args:
           - --allow
           - "mighty-muffin/*"

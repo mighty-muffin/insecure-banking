@@ -21,6 +21,7 @@ Constitutional Requirements:
 import pytest
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
+from django.conf import settings
 from unittest.mock import patch, Mock
 
 from web.models import Account, CashAccount, CreditAccount
@@ -90,7 +91,7 @@ class TestAdminFlow(TestCase):
         # Access admin dashboard
         response = self.client.get('/admin')
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'admin.html')
+        self.assertTemplateUsed(response, 'admin.html')
 
         # Verify admin has access to all user accounts
         mock_find_by_username.assert_called_with('admin')
@@ -318,7 +319,7 @@ class TestAdminFlow(TestCase):
                 # Simulate session hijacking (if session key is predictable/exposed)
                 if admin_session_key:
                     # This would be the vulnerability - using another user's session
-                    hijacker_client.session = self.client.session
+                    hijacker_client.cookies[settings.SESSION_COOKIE_NAME] = admin_session_key
 
                     response2 = hijacker_client.get('/admin')
 

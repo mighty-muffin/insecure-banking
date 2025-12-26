@@ -59,10 +59,10 @@ class TestAuthenticationFlow(TestCase):
         )
 
         self.credit_account = CreditAccount.objects.create(
+            cashAccountId=self.cash_account.id,
             number='9876543210',
             username='testuser',
             description='Test Credit Account',
-            balance=500.00,
             availableBalance=1500.00
         )
 
@@ -79,7 +79,7 @@ class TestAuthenticationFlow(TestCase):
         # Step 1: Access login page
         response = self.client.get('/login')
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'login.html')
+        self.assertTemplateUsed(response, 'login.html')
 
         # Step 2: Submit login credentials
         with patch('web.views.authenticate') as mock_auth:

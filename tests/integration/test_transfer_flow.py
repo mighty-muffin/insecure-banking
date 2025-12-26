@@ -100,7 +100,7 @@ class TestTransferFlow(TestCase):
         # Step 1: Access transfer page
         response = self.client.get('/transfer')
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'newTransfer.html')
+        self.assertTemplateUsed(response, 'newTransfer.html')
 
         # Verify accountType cookie is set
         self.assertEqual(response.cookies['accountType'].value, 'Personal')
@@ -118,7 +118,7 @@ class TestTransferFlow(TestCase):
 
         # For Personal account type, should redirect to transfer check
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'transferCheck.html')
+        self.assertTemplateUsed(response, 'transferCheck.html')
 
         # Verify session contains pending transfer
         self.assertIn('pendingTransfer', self.client.session)
@@ -137,7 +137,7 @@ class TestTransferFlow(TestCase):
 
         # Should complete transfer and show confirmation
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'transferConfirmation.html')
+        self.assertTemplateUsed(response, 'transferConfirmation.html')
 
         # Verify transfer was created
         mock_create_transfer.assert_called_once()
@@ -176,11 +176,12 @@ class TestTransferFlow(TestCase):
         with patch('web.views.to_traces') as mock_to_traces:
             mock_to_traces.return_value = "0"
 
+            self.client.cookies['accountType'] = 'Personal'
             response = self.client.post('/transfer', transfer_data)
 
             # Should proceed to check page (vulnerability - no balance validation)
             self.assertEqual(response.status_code, 200)
-            self.assertContains(response, 'transferCheck.html')
+            self.assertTemplateUsed(response, 'transferCheck.html')
 
     def test_transfer_validation_bypass(self):
         """Test transfer validation bypass vulnerabilities."""
@@ -262,6 +263,7 @@ class TestTransferFlow(TestCase):
                 with patch('web.views.to_traces') as mock_to_traces:
                     mock_to_traces.return_value = "0"
 
+                    self.client.cookies['accountType'] = 'Personal'
                     response = self.client.post('/transfer', transfer_data)
 
                     # The vulnerable code should process malicious input
@@ -293,6 +295,7 @@ class TestTransferFlow(TestCase):
                 with patch('web.views.to_traces') as mock_to_traces:
                     mock_to_traces.return_value = "0"
 
+                    self.client.cookies['accountType'] = 'Personal'
                     response = self.client.post('/transfer', transfer_data)
 
                     # Verify command injection attempt was passed through
@@ -320,6 +323,7 @@ class TestTransferFlow(TestCase):
                 }
 
                 with patch('web.views.to_traces'):
+                    self.client.cookies['accountType'] = 'Personal'
                     self.client.post('/transfer', transfer_data)
 
                 # Step 2: Manually manipulate session data
@@ -361,6 +365,7 @@ class TestTransferFlow(TestCase):
                 }
 
                 with patch('web.views.to_traces'):
+                    self.client.cookies['accountType'] = 'Personal'
                     response = self.client.post('/transfer', transfer_data)
 
                     # Should proceed without authorization check (vulnerability)

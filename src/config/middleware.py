@@ -10,5 +10,4 @@ class AuthRequiredMiddleware:
         principal = request.user
         if principal.is_authenticated or login_page:
             return self.get_response(request)
-        else:
-            return HttpResponseRedirect("/login")
+        return HttpResponseRedirect("/login")

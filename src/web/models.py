@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class ModelSerializationMixin(object):
+class ModelSerializationMixin:
     def as_dict(self) -> dict:
         data = {}
         for field in self._meta.fields:

@@ -75,10 +75,10 @@ class TestDatabaseIntegration(TransactionTestCase):
 
         # Create credit accounts
         self.credit_account1 = CreditAccount.objects.create(
+            cashAccountId=self.cash_account1.id,
             number='3333333333',
             username='user1',
             description='User 1 Credit Account',
-            balance=200.00,
             availableBalance=800.00
         )
 

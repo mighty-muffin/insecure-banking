@@ -1,8 +1,8 @@
 [project]
 name = "insecure-python"
-version = "0.2.4"
 description = "Add your description here"
 readme = "README.md"
+version = "0.0.0"
 requires-python = ">=3.10"
 dependencies = [
     "asgiref==3.7.2",
@@ -10,7 +10,7 @@ dependencies = [
     "pycryptodome==3.18.0",
     "sqlparse==0.4.4",
     "typing-extensions==4.7.1",
-]
+    ]
 
 
 [dependency-groups]
@@ -21,14 +21,22 @@ dev = [
     "pathspec==0.11.2",
     "pip-tools==7.2.0",
     "platformdirs==3.10.0",
+    "pre-commit>=4.5.0",
     "pyproject-hooks==1.0.0",
-    "pytest>=8.4.2",
     "pytest-cov>=7.0.0",
     "pytest-django>=4.11.1",
     "pytest-mock>=3.15.1",
+    "pytest-xdist>=3.8.0",
+    "pytest>=8.4.2",
+    "ruff>=0.14.4",
     "tomli==2.0.1",
+    "ty>=0.0.1a34",
     "wheel==0.41.0",
-]
+    ]
+
+
+[tool.uv]
+required-version = ">=0.9.0"
 
 
 [tool.commitizen]
@@ -37,7 +45,7 @@ version = "0.2.4"
 tag_format = "v$version"
 version_files = [
     "pyproject.toml:version",
-]
+    ]
 
 
 [tool.pytest.ini_options]
@@ -50,21 +58,96 @@ addopts = [
     "--cov-report=term-missing",
     "--cov-report=html:tests/coverage/html",
     "--cov-report=xml:tests/coverage/coverage.xml",
-    "--cov-fail-under=80",
+    "--cov-fail-under=92",
+    "--numprocesses", "auto",
     "--strict-markers",
+    "--tb=short",
     "--verbose",
-]
+    ]
 markers = [
     "unit: Unit tests",
     "integration: Integration tests",
     "security: Security-focused tests",
-    "slow: Slow-running tests",
-]
+    ]
 filterwarnings = [
     "ignore::django.utils.deprecation.RemovedInDjango50Warning",
     "ignore::DeprecationWarning",
+    ]
+
+
+[tool.ruff]
+extend-exclude = [
+    "__pycache__",
+    ".venv",
+    "install",
+    "tests",
+    "scripts",
+    ]
+line-length = 128
+src = [
+    "src",
+    ]
+target-version = "py310"
+
+
+[tool.ruff.lint]
+extend-select = [
+  "C4",
+  "D200",
+  "D201",
+  "D204",
+  "D205",
+  "D206",
+  "D210",
+  "D211",
+  "D213",
+  "D300",
+  "D400",
+  "D402",
+  "D403",
+  "D404",
+  "D419",
+  "E",
+  "F",
+  "FURB",
+  "G010",
+  "I",
+  "INP001",
+  "N805",
+  "PERF101",
+  "PERF102",
+  "PERF401",
+  "PERF402",
+  "PGH004",
+  "PGH005",
+  "PIE794",
+  "PIE796",
+  "PIE807",
+  "PIE810",
+  "PLR",
+  "RET502",
+  "RET503",
+  "RET504",
+  "RET505",
+  "RUF015",
+  "RUF032",
+  "RUF033",
+  "RUF034",
+  "RUF041",
+  "RUF046",
+  "RUF100",
+  "S101",
+  "T20",
+  "UP",
+  "W",
 ]
 
 
-[tool.setuptools]
-py-modules = []
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = [
+  "S101"
+  ]

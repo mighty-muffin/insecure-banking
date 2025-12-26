@@ -243,6 +243,7 @@ class TestCryptographicWeaknesses(TestCase):
                         mock_crypter = Mock()
                         mock_des.new.return_value = mock_crypter
                         mock_des.MODE_CBC = 2  # Simulate CBC mode constant
+                        mock_crypter.encrypt.return_value = b"encrypted_data"
 
                         # Simulate padding
                         block_size = 8
@@ -388,13 +389,18 @@ class TestCryptographicWeaknesses(TestCase):
 
         for plaintext in identical_plaintexts:
             with patch('web.views.DES') as mock_des:
+                # Create consistent mock behavior
+                mock_crypter = Mock()
+                mock_des.new.return_value = mock_crypter
+                # Make encryption deterministic for same input
+                encrypted_val = b'encrypted_' + plaintext
+                mock_crypter.encrypt.return_value = encrypted_val
+
+                # Pre-calculate expected base64 value BEFORE patching
+                expected_b64 = base64.b64encode(encrypted_val)
+
                 with patch('web.views.base64.b64encode') as mock_b64:
-                    # Create consistent mock behavior
-                    mock_crypter = Mock()
-                    mock_des.new.return_value = mock_crypter
-                    # Make encryption deterministic for same input
-                    mock_crypter.encrypt.return_value = b'encrypted_' + plaintext
-                    mock_b64.return_value = base64.b64encode(b'encrypted_' + plaintext)
+                    mock_b64.return_value = expected_b64
 
                     result = get_file_checksum(plaintext)
                     results.append((plaintext, result))

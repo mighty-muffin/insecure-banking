@@ -23,13 +23,13 @@ def pytest_configure(config):
     django.setup()
 
 
-@pytest.fixture(scope="session")
-def django_db_setup():
-    """Set up Django test database."""
-    settings.DATABASES["default"] = {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": ":memory:",
-    }
+# @pytest.fixture(scope="session")
+# def django_db_setup():
+#     """Set up Django test database."""
+#     settings.DATABASES["default"] = {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": ":memory:",
+#     }
 
 
 @pytest.fixture
@@ -311,7 +311,7 @@ def transfer_factory():
             'date': datetime.now()
         }
         defaults.update(kwargs)
-        return Transfer.objects.create(**kwargs)
+        return Transfer.objects.create(**defaults)
     return _create_transfer
 
 
@@ -329,7 +329,7 @@ def transaction_factory():
             'date': datetime.now()
         }
         defaults.update(kwargs)
-        return Transaction.objects.create(**kwargs)
+        return Transaction.objects.create(**defaults)
     return _create_transaction
 
 
