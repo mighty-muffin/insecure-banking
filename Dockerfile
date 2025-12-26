@@ -1,5 +1,5 @@
 # Build stage
-FROM python:3.10-alpine3.20 AS builder
+FROM python:3.13-alpine3.20 AS builder
 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
@@ -22,7 +22,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 RUN uv pip install -r requirements.txt
 
 # Runtime stage
-FROM python:3.10-alpine3.20
+FROM python:3.13-alpine3.20
 
 ARG GIT_COMMIT="unknown"
 ARG REPO_URL=""
