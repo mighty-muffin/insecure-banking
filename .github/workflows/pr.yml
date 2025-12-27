@@ -241,6 +241,7 @@ jobs:
 
   gating:
     needs:
+      - code_scan
       - docker_scan
       - secret
     name: Gating
