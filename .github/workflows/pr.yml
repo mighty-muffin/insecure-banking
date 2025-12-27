@@ -171,6 +171,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
+      - name: Prepare environment for current platform
+        id: prepare
+        run: |
+          platform=${{ matrix.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+        shell: bash
+
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
@@ -226,23 +233,9 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         with:
-          name: digests-${{ matrix.platform }}
+          name: digests-${{ env.PLATFORM_PAIR }}
           path: /tmp/digests/*
           if-no-files-found: error
-          retention-days: 1
-
-      - name: Run Container Scan
-        id: container
-        run: |
-          echo Run SAST
-        shell: bash
-
-      - name: Check status of potentially failing step and issue warning
-        if: steps.container.outcome == 'failure'
-        run: |
-          echo "::error::The previous step detected potential vulnerabilities in the code. Please review the scan report above."
-          exit 1
-        shell: bash
 
   docker-merge:
     needs:
@@ -291,14 +284,28 @@ jobs:
       - name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf 'ghcr.io/${{ github.repository }}@sha256:%s ' *)
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") $(printf 'ghcr.io/${{ github.repository }}@sha256:%s ' *)
+          retention-days: 1
+        shell: bash
+
+      - name: Run Container Scan
+        id: container
+        run: |
+          echo Run Container Scan
+        shell: bash
+
+      - name: Check status of potentially failing step and issue warning
+        if: steps.container.outcome == 'failure'
+        run: |
+          echo "::error::The previous step detected potential vulnerabilities in the code. Please review the scan report above."
+          exit 1
+        shell: bash
 
       - name: Find the primary image tag we just pushed, and output it
         id: image-tag
         run: |
-          # shellcheck disable=SC2086
           echo "image-tag=${{ steps.docker_meta.outputs.version }}" >> $GITHUB_OUTPUT
+        shell: bash
 
   gating:
     needs:
@@ -311,5 +318,6 @@ jobs:
     steps:
 
       - name: Run Gating Check
-        run: echo Run Gating Check
+        run: |
+          echo Run Gating Check
         shell: bash
