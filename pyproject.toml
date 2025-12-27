@@ -15,17 +15,19 @@ dependencies = [
 
 
 [dependency-groups]
+build = [
+    "build==0.10.0",
+    "packaging==23.1",
+    "wheel==0.41.0",
+]
 dev = [
     "bandit>=1.9.2",
     "build==0.10.0",
     "click==8.1.6",
-    "packaging==23.1",
     "pathspec==0.11.2",
     "pip-tools==7.2.0",
     "platformdirs==3.10.0",
     "pre-commit>=4.5.0",
-    "mkdocs>=1.5.0",
-    "mkdocs-material>=9.5.0",
     "pyproject-hooks==1.0.0",
     "pytest-cov>=7.0.0",
     "pytest-django>=4.11.1",
@@ -35,7 +37,10 @@ dev = [
     "ruff>=0.14.4",
     "tomli==2.0.1",
     "ty>=0.0.1a34",
-    "wheel==0.41.0",
+]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.5.0",
 ]
 
 

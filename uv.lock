@@ -409,13 +409,15 @@ dependencies = [
 ]
 
 [package.dev-dependencies]
+build = [
+    { name = "build" },
+    { name = "packaging" },
+    { name = "wheel" },
+]
 dev = [
     { name = "bandit" },
     { name = "build" },
     { name = "click" },
-    { name = "mkdocs" },
-    { name = "mkdocs-material" },
-    { name = "packaging" },
     { name = "pathspec" },
     { name = "pip-tools" },
     { name = "platformdirs" },
@@ -429,7 +431,10 @@ dev = [
     { name = "ruff" },
     { name = "tomli" },
     { name = "ty" },
-    { name = "wheel" },
+]
+docs = [
+    { name = "mkdocs" },
+    { name = "mkdocs-material" },
 ]
 
 [package.metadata]
@@ -443,13 +448,15 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
+build = [
+    { name = "build", specifier = "==0.10.0" },
+    { name = "packaging", specifier = "==23.1" },
+    { name = "wheel", specifier = "==0.41.0" },
+]
 dev = [
     { name = "bandit", specifier = ">=1.9.2" },
     { name = "build", specifier = "==0.10.0" },
     { name = "click", specifier = "==8.1.6" },
-    { name = "mkdocs", specifier = ">=1.5.0" },
-    { name = "mkdocs-material", specifier = ">=9.5.0" },
-    { name = "packaging", specifier = "==23.1" },
     { name = "pathspec", specifier = "==0.11.2" },
     { name = "pip-tools", specifier = "==7.2.0" },
     { name = "platformdirs", specifier = "==3.10.0" },
@@ -463,7 +470,10 @@ dev = [
     { name = "ruff", specifier = ">=0.14.4" },
     { name = "tomli", specifier = "==2.0.1" },
     { name = "ty", specifier = ">=0.0.1a34" },
-    { name = "wheel", specifier = "==0.41.0" },
+]
+docs = [
+    { name = "mkdocs", specifier = ">=1.5.0" },
+    { name = "mkdocs-material", specifier = ">=9.5.0" },
 ]
 
 [[package]]
