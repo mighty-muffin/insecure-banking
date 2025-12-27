@@ -1,0 +1,53 @@
+---
+site_name: Insecure Banking Documentation
+site_description: Documentation for the Insecure Banking application
+site_author: Mighty Muffin
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    # - navigation.sections
+    - toc.integrated
+    - content.code.annotate
+    - content.code.copy
+
+docs_dir: docs
+
+nav:
+  - Home: README.md
+  - Project Overview: project-overview.md
+  - Architecture:
+    - Overview: architecture/overview.md
+    - Authentication: architecture/authentication.md
+    - Database Schema: architecture/database-schema.md
+    - Django Framework: architecture/django-framework.md
+    - Middleware: architecture/middleware.md
+    - Models: architecture/models.md
+    - Security Vulnerabilities: architecture/security-vulnerabilities.md
+    - Services: architecture/services.md
+    - Views & URLs: architecture/views-urls.md
+  - Development:
+    - Setup: development/setup.md
+    - Running: development/running.md
+    - Docker: development/docker.md
+    - Dependencies: development/dependencies.md
+    - Code Quality: development/code-quality.md
+    - Contributing: development/contributing.md
+  - Testing:
+    - Overview: testing/overview.md
+    - Configuration: testing/configuration.md
+    - Unit Tests: testing/unit-tests.md
+    - Integration Tests: testing/integration-tests.md
+    - Security Tests: testing/security-tests.md
+    - Structure: testing/structure.md
+  - Pipelines & CI/CD:
+    - Overview: pipelines/overview.md
+    - Main Workflow: pipelines/main-workflow.md
+    - PR Workflow: pipelines/pr-workflow.md
+    - Pre-Commit: pipelines/pre-commit.md
+    - Tag Workflow: pipelines/tag-workflow.md
+  - Security:
+    - Overview: security/overview.md
+    - Vulnerabilities: security/vulnerabilities.md
+    - Security Testing: security/security-testing.md
