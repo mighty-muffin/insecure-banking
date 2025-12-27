@@ -35,3 +35,27 @@
 Username: john
 Password: test
 ```
+
+## Testing
+
+### Unit and Integration Tests
+
+Run unit and integration tests with pytest:
+
+```bash
+pytest tests/ -m "not e2e"
+```
+
+### End-to-End Tests
+
+Run end-to-end tests with Playwright:
+
+```bash
+# Make sure the application is running first
+python src/manage.py runserver
+
+# In a separate terminal, run e2e tests
+pytest tests/e2e/ -p no:django -m e2e --no-cov
+```
+
+For more details on e2e testing, see [tests/e2e/README.md](tests/e2e/README.md).
