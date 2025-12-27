@@ -243,10 +243,11 @@ jobs:
         run: |
           IMAGE_URI="ghcr.io/${{ github.repository }}:${{ needs.docker_build.outputs.image-tag }}"
           docker pull "$IMAGE_URI"
-          docker run --detach --publish 8000:8000 --name ${{ github.repository }} "$IMAGE_URI"
+          docker run --detach --publish 8000:8000 --name insecure-banking-smoke "$IMAGE_URI"
         shell: bash
 
       - name: Wait for Healthcheck
+        id: smoke
         run: |
           timeout=60
           start_time=$(date +%s)
@@ -254,11 +255,11 @@ jobs:
             current_time=$(date +%s)
             if [ $((current_time - start_time)) -gt $timeout ]; then
               echo "Timeout waiting for container to be healthy"
-              docker logs ${{ github.repository }}
+              docker logs insecure-banking-smoke
               exit 1
             fi
 
-            status=$(docker inspect --format='{{.State.Health.Status}}' test-container)
+            status=$(docker inspect --format='{{.State.Health.Status}}' insecure-banking-smoke)
             if [ "$status" == "healthy" ]; then
               echo "Container is healthy"
               exit 0
@@ -266,13 +267,20 @@ jobs:
 
             if [ "$status" == "unhealthy" ]; then
                echo "Container is unhealthy"
-               docker logs ${{ github.repository }}
+               docker logs insecure-banking-smoke
                exit 1
             fi
 
             echo "Waiting for healthcheck... ($((current_time - start_time))s)"
             sleep 2
           done
+        shell: bash
+
+      - name: Check status of potentially failing step and issue warning
+        if: steps.smoke.outcome == 'failure'
+        run: |
+          echo "::error::The previous step detected potential failure in the code. Please review the report above."
+          exit 1
         shell: bash
 
   docker_scan:
@@ -300,6 +308,7 @@ jobs:
     needs:
       - code_scan
       - docker_scan
+      - docker_smoke
       - secret
     name: Gating
     runs-on: ubuntu-24.04
