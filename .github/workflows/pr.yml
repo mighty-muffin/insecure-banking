@@ -109,7 +109,6 @@ jobs:
   code_scan:
     needs:
       - pre-commit
-      - secret
     name: Vulnerabilities Scan
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -153,7 +152,6 @@ jobs:
   docker_build:
     needs:
       - code_build
-      - secret
     name: Docker Build & Scan
     runs-on: ubuntu-24.04
     timeout-minutes: 15
