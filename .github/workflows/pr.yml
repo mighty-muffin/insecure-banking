@@ -16,6 +16,8 @@ permissions:
   contents: read
   packages: write
   pull-requests: write
+env:
+  GHCR_IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
 
@@ -154,7 +156,7 @@ jobs:
   docker-build:
     needs:
       - build
-    name: Docker Build
+    name: Docker Build for ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -201,8 +203,7 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         with:
-          images: |
-            ghcr.io/${{ github.repository }}
+          images: ${{ env.GHCR_IMAGE }}
 
       - name: Docker Build
         id: build_image
@@ -214,7 +215,7 @@ jobs:
           context: .
           file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
-          outputs: type=image,name=ghcr.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true,oci-mediatypes=true
+          outputs: type=image,name=${{ env.GHCR_IMAGE }},push-by-digest=true,name-canonical=true,push=true,oci-mediatypes=true
           cache-from: type=gha,scope=${{ github.repository }}-${{ github.ref_name }}-${{ matrix.platform }}
           cache-to: type=gha,scope=${{ github.repository }}-${{ github.ref_name }}-${{ matrix.platform }}
           labels: ${{ steps.docker_meta.outputs.labels }}
@@ -270,8 +271,7 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         with:
-          images: |
-            ghcr.io/${{ github.repository }}
+          images: ${{ env.GHCR_IMAGE }}
           annotations: |
             type=org.opencontainers.image.description,value=${{ github.event.repository.description || 'No description provided' }}
           tags: |
@@ -289,33 +289,25 @@ jobs:
         id: manifest-annotate
         continue-on-error: true
         run: |
-              docker buildx imagetools create \
-                $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-                --annotation='index:org.opencontainers.image.description=${{ github.event.repository.description }}' \
-                --annotation='index:org.opencontainers.image.created=${{ steps.timestamp.outputs.timestamp }}' \
-                --annotation='index:org.opencontainers.image.url=${{ github.event.repository.url }}' \
-                --annotation='index:org.opencontainers.image.source=${{ github.event.repository.url }}' \
-                $(printf 'ghcr.io/${{ github.repository }}@sha256:%s ' *)
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            --annotation='index:org.opencontainers.image.description=${{ github.event.repository.description }}' \
+            --annotation='index:org.opencontainers.image.created=${{ steps.timestamp.outputs.timestamp }}' \
+            --annotation='index:org.opencontainers.image.url=${{ github.event.repository.url }}' \
+            --annotation='index:org.opencontainers.image.source=${{ github.event.repository.url }}' \
+            $(printf '${{ env.GHCR_IMAGE }}@sha256:%s ' *)
         shell: bash
 
       - name: Create manifest list and push without annotations
-        # This step creates a manifest list for the Docker images built for different platforms.
-        # It uses the docker buildx imagetools create command to create the manifest list.
-        # The manifest list is created without annotations if the previous step fails.
-        # The manifest list is pushed to the GitHub Container Registry (GHCR) with the specified tags.
         if: steps.manifest-annotate.outcome == 'failure'
         working-directory: /tmp/digests
         run: |
-              docker buildx imagetools create  $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-                $(printf 'ghcr.io/${{ github.repository }}@sha256:%s ' *)
-
+          docker buildx imagetools create  $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.GHCR_IMAGE }}@sha256:%s ' *)
       - name: Inspect image
-        # This step inspects the created manifest list to verify its contents.
-        # It uses the docker buildx imagetools inspect command to display information about the manifest list.
-        # The inspection output will show the platforms and tags associated with the manifest list.
         id: inspect
         run: |
-          docker buildx imagetools inspect 'ghcr.io/${{ github.repository }}:${{ steps.docker_meta.outputs.version }}'
+          docker buildx imagetools inspect '${{ env.GHCR_IMAGE }}:${{ steps.docker_meta.outputs.version }}'
         shell: bash
 
   docker-scan:
