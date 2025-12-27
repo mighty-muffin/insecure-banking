@@ -158,6 +158,8 @@ jobs:
       - code_build
     name: Container Build
     runs-on: ubuntu-24.04
+    outputs:
+      image-tag: ${{ steps.image-tag.outputs.image-tag }}
     timeout-minutes: 15
 
     steps:
@@ -222,9 +224,61 @@ jobs:
           echo "image-tag=${{ steps.docker_meta.outputs.version }}" >> $GITHUB_OUTPUT
         shell: bash
 
+  docker_smoke:
+    needs:
+      - docker_build
+    name: Container Smoke Test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Login to GHCR
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull and Run Container
+        run: |
+          IMAGE_URI="ghcr.io/${{ github.repository }}:${{ needs.docker_build.outputs.image-tag }}"
+          docker pull "$IMAGE_URI"
+          docker run --detach --publish 8000:8000 --name ${{ github.repository }} "$IMAGE_URI"
+        shell: bash
+
+      - name: Wait for Healthcheck
+        run: |
+          timeout=60
+          start_time=$(date +%s)
+          while true; do
+            current_time=$(date +%s)
+            if [ $((current_time - start_time)) -gt $timeout ]; then
+              echo "Timeout waiting for container to be healthy"
+              docker logs ${{ github.repository }}
+              exit 1
+            fi
+
+            status=$(docker inspect --format='{{.State.Health.Status}}' test-container)
+            if [ "$status" == "healthy" ]; then
+              echo "Container is healthy"
+              exit 0
+            fi
+
+            if [ "$status" == "unhealthy" ]; then
+               echo "Container is unhealthy"
+               docker logs ${{ github.repository }}
+               exit 1
+            fi
+
+            echo "Waiting for healthcheck... ($((current_time - start_time))s)"
+            sleep 2
+          done
+        shell: bash
+
   docker_scan:
     needs:
       - docker_build
+      - docker_smoke
     name: Container Vulnerability Scan
     runs-on: ubuntu-24.04
     timeout-minutes: 10
