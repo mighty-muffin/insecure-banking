@@ -278,7 +278,6 @@ jobs:
   docker_scan:
     needs:
       - docker_build
-      - docker_smoke
     name: Container Vulnerability Scan
     runs-on: ubuntu-24.04
     timeout-minutes: 10
