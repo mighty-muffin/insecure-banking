@@ -131,6 +131,8 @@ if [ "$SUCCESS" = "true" ]; then
     
     # Update .env file with domain
     if [ -f .env ]; then
+        # Escape periods in domain for regex
+        ESCAPED_DOMAIN="${FULL_DOMAIN//./\\.}"
         # Use a backup file for cross-platform compatibility
         if grep -q "ALLOWED_HOSTS=" .env; then
             sed -i.bak "s|ALLOWED_HOSTS=.*|ALLOWED_HOSTS=$FULL_DOMAIN,*.azurecontainer.io|" .env && rm -f .env.bak

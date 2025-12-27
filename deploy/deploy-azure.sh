@@ -68,7 +68,8 @@ if [ -z "$SECRET_KEY" ]; then
     echo -e "${YELLOW}Enter Django SECRET_KEY (or press Enter to generate one):${NC}"
     read -r SECRET_KEY
     if [ -z "$SECRET_KEY" ]; then
-        SECRET_KEY=$(openssl rand -base64 48)
+        # Generate URL-safe base64 string without special characters
+        SECRET_KEY=$(openssl rand -base64 48 | tr -d "=+/" | cut -c1-50)
         echo -e "${GREEN}Generated SECRET_KEY: $SECRET_KEY${NC}"
     fi
 fi
@@ -215,7 +216,10 @@ echo "  IP: $CONTAINER_IP"
 echo
 
 # Save configuration
+# WARNING: This file contains sensitive information. Do not commit to version control.
 cat > .env.deployment <<EOF
+# Azure Deployment Configuration
+# WARNING: Contains sensitive information - do not commit!
 AZURE_RESOURCE_GROUP=$RESOURCE_GROUP
 AZURE_LOCATION=$LOCATION
 AZURE_CONTAINER_NAME=$CONTAINER_NAME
@@ -227,6 +231,7 @@ ACR_NAME=$ACR_NAME
 EOF
 
 echo -e "${GREEN}Deployment configuration saved to .env.deployment${NC}"
+echo -e "${YELLOW}WARNING: .env.deployment contains sensitive data. Do not commit to version control.${NC}"
 echo
 
 if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ZONE_ID" ]; then
