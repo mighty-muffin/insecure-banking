@@ -44,12 +44,13 @@ def test_successful_login_and_logout(page: Page, base_url: str, test_credentials
     # The exact selector depends on the dashboard page structure
     expect(page.locator('body')).to_be_visible()
     
-    # Logout - look for logout link/button
-    logout_selector = 'a[href="/logout"], button:has-text("Logout"), a:has-text("Logout")'
-    if page.locator(logout_selector).count() > 0:
-        page.click(logout_selector)
-        page.wait_for_url(f"{base_url}/login")
-        expect(page).to_have_url(f"{base_url}/login")
+    # Logout - try to navigate to logout URL directly
+    # The logout link may be in a hidden menu that's hard to click
+    page.goto(f"{base_url}/logout")
+    
+    # Wait for redirect to login page
+    page.wait_for_url(f"{base_url}/login")
+    expect(page).to_have_url(f"{base_url}/login")
 
 
 @pytest.mark.e2e

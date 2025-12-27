@@ -380,3 +380,4 @@ pyrightconfig.json
 test-results/
 playwright-report/
 playwright/.cache/
+traces.txt
