@@ -28,10 +28,24 @@ fi
 # Load environment variables from .env file if it exists
 if [ -f .env ]; then
     echo -e "${GREEN}Loading environment variables from .env file...${NC}"
-    export $(grep -v '^#' .env | xargs)
+    set -a
+    # shellcheck source=/dev/null
+    source .env
+    set +a
 else
     echo -e "${YELLOW}No .env file found. Using defaults or command-line arguments.${NC}"
 fi
+
+# Function to get git information
+get_git_info() {
+    GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+    REPO_URL=$(git config --get remote.origin.url 2>/dev/null | sed 's/git@/https:\/\//; s/.com:/.com\//; s/\.git$//' || echo "")
+}
+
+# Function to generate unique ACR name
+generate_acr_name() {
+    echo "insecurebank$(date +%s)"
+}
 
 # Get configuration from environment or prompt user
 RESOURCE_GROUP=${AZURE_RESOURCE_GROUP:-insecure-banking-rg}
@@ -52,7 +66,7 @@ echo
 # Prompt for Django secret key
 if [ -z "$SECRET_KEY" ]; then
     echo -e "${YELLOW}Enter Django SECRET_KEY (or press Enter to generate one):${NC}"
-    read SECRET_KEY
+    read -r SECRET_KEY
     if [ -z "$SECRET_KEY" ]; then
         SECRET_KEY=$(openssl rand -base64 48)
         echo -e "${GREEN}Generated SECRET_KEY: $SECRET_KEY${NC}"
@@ -80,8 +94,7 @@ read -p "Select option (1-3): " DEPLOY_METHOD
 case $DEPLOY_METHOD in
     1)
         echo -e "${GREEN}Building Docker image locally...${NC}"
-        GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-        REPO_URL=$(git config --get remote.origin.url 2>/dev/null | sed 's/git@/https:\/\//; s/.com:/.com\//; s/\.git$//' || echo "")
+        get_git_info
         
         docker build \
             --build-arg GIT_COMMIT="$GIT_COMMIT" \
@@ -95,7 +108,7 @@ case $DEPLOY_METHOD in
         # For local deployment, we'll use Azure Container Registry
         read -p "Create and use Azure Container Registry? (y/n): " USE_ACR
         if [ "$USE_ACR" = "y" ]; then
-            ACR_NAME="insecurebanking$(date +%s)"
+            ACR_NAME=$(generate_acr_name)
             echo -e "${GREEN}Creating Azure Container Registry: $ACR_NAME${NC}"
             az acr create --resource-group "$RESOURCE_GROUP" --name "$ACR_NAME" --sku Basic --admin-enabled true
             
@@ -115,14 +128,13 @@ case $DEPLOY_METHOD in
     2)
         read -p "Enter Azure Container Registry name (or leave empty to create new): " ACR_NAME
         if [ -z "$ACR_NAME" ]; then
-            ACR_NAME="insecurebanking$(date +%s)"
+            ACR_NAME=$(generate_acr_name)
             echo -e "${GREEN}Creating Azure Container Registry: $ACR_NAME${NC}"
             az acr create --resource-group "$RESOURCE_GROUP" --name "$ACR_NAME" --sku Basic --admin-enabled true
         fi
         
         echo -e "${GREEN}Building image with ACR...${NC}"
-        GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-        REPO_URL=$(git config --get remote.origin.url 2>/dev/null | sed 's/git@/https:\/\//; s/.com:/.com\//; s/\.git$//' || echo "")
+        get_git_info
         
         az acr build --registry "$ACR_NAME" --image "$IMAGE_NAME" \
             --build-arg GIT_COMMIT="$GIT_COMMIT" \
@@ -144,7 +156,7 @@ echo
 echo -e "${GREEN}Step 3: Deploying container to Azure...${NC}"
 
 # Get ACR credentials if using ACR
-if [ ! -z "$ACR_NAME" ]; then
+if [ -n "$ACR_NAME" ]; then
     ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query "passwords[0].value" -o tsv)
     ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query "username" -o tsv)
     ACR_SERVER="$ACR_NAME.azurecr.io"
@@ -217,7 +229,7 @@ EOF
 echo -e "${GREEN}Deployment configuration saved to .env.deployment${NC}"
 echo
 
-if [ ! -z "$CLOUDFLARE_API_TOKEN" ] && [ ! -z "$CLOUDFLARE_ZONE_ID" ]; then
+if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ZONE_ID" ]; then
     echo -e "${YELLOW}Cloudflare DNS detected. Run ./deploy/setup-cloudflare.sh to configure DNS.${NC}"
 else
     echo -e "${YELLOW}To configure Cloudflare DNS:${NC}"

@@ -11,7 +11,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - SECRET_KEY=${SECRET_KEY:-django-insecure-u5+_1cyk&@5&#ik_qn09f#v4m^c^9riq68xnd@3uwofv$wi)3_}
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
       - DEBUG=${DEBUG:-False}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
     restart: unless-stopped

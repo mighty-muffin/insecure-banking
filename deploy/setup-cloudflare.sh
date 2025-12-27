@@ -27,12 +27,18 @@ fi
 # Load environment variables
 if [ -f .env ]; then
     echo -e "${GREEN}Loading environment from .env file...${NC}"
-    export $(grep -v '^#' .env | xargs)
+    set -a
+    # shellcheck source=/dev/null
+    source .env
+    set +a
 fi
 
 if [ -f .env.deployment ]; then
     echo -e "${GREEN}Loading deployment configuration...${NC}"
-    export $(grep -v '^#' .env.deployment | xargs)
+    set -a
+    # shellcheck source=/dev/null
+    source .env.deployment
+    set +a
 fi
 
 # Check required variables
@@ -74,7 +80,7 @@ RECORD_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$CLOUDFLA
     -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
     -H "Content-Type: application/json" | jq -r '.result[0].id // empty')
 
-if [ ! -z "$RECORD_ID" ] && [ "$RECORD_ID" != "null" ]; then
+if [ -n "$RECORD_ID" ] && [ "$RECORD_ID" != "null" ]; then
     echo -e "${YELLOW}Existing A record found. Updating...${NC}"
     RESPONSE=$(curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/dns_records/$RECORD_ID" \
         -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
@@ -125,8 +131,9 @@ if [ "$SUCCESS" = "true" ]; then
     
     # Update .env file with domain
     if [ -f .env ]; then
+        # Use a backup file for cross-platform compatibility
         if grep -q "ALLOWED_HOSTS=" .env; then
-            sed -i "s|ALLOWED_HOSTS=.*|ALLOWED_HOSTS=$FULL_DOMAIN,*.azurecontainer.io|" .env
+            sed -i.bak "s|ALLOWED_HOSTS=.*|ALLOWED_HOSTS=$FULL_DOMAIN,*.azurecontainer.io|" .env && rm -f .env.bak
         else
             echo "ALLOWED_HOSTS=$FULL_DOMAIN,*.azurecontainer.io" >> .env
         fi

@@ -148,7 +148,9 @@ For HTTPS access, you have several options:
 1. In Cloudflare Dashboard, go to SSL/TLS
 2. Select "Flexible" SSL mode
 3. Traffic is encrypted between browser and Cloudflare
-4. Access your app at `https://bank.yourdomain.com:8000`
+4. Access your app at `https://bank.yourdomain.com` (without port 8000)
+
+**Note:** With Cloudflare proxy enabled, custom ports (like 8000) are not accessible via HTTPS. You'll need to use one of the options below to handle port forwarding or use standard ports.
 
 #### Option 2: Cloudflare Tunnel (Recommended)
 1. Install cloudflared in your container
