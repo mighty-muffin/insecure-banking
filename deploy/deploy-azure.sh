@@ -230,6 +230,9 @@ SECRET_KEY=$SECRET_KEY
 ACR_NAME=$ACR_NAME
 EOF
 
+# Restrict file permissions to owner only
+chmod 600 .env.deployment
+
 echo -e "${GREEN}Deployment configuration saved to .env.deployment${NC}"
 echo -e "${YELLOW}WARNING: .env.deployment contains sensitive data. Do not commit to version control.${NC}"
 echo

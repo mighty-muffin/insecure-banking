@@ -135,7 +135,7 @@ if [ "$SUCCESS" = "true" ]; then
         ESCAPED_DOMAIN="${FULL_DOMAIN//./\\.}"
         # Use a backup file for cross-platform compatibility
         if grep -q "ALLOWED_HOSTS=" .env; then
-            sed -i.bak "s|ALLOWED_HOSTS=.*|ALLOWED_HOSTS=$FULL_DOMAIN,*.azurecontainer.io|" .env && rm -f .env.bak
+            sed -i.bak "s|ALLOWED_HOSTS=.*|ALLOWED_HOSTS=$ESCAPED_DOMAIN,*.azurecontainer.io|" .env && rm -f .env.bak
         else
             echo "ALLOWED_HOSTS=$FULL_DOMAIN,*.azurecontainer.io" >> .env
         fi
