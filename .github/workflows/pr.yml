@@ -16,14 +16,12 @@ permissions:
   contents: read
   packages: write
   pull-requests: write
-env:
-  GHCR_IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
 
   pre-commit:
     name: Pre-Commit
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim-24.04
     timeout-minutes: 5
 
     steps:
@@ -63,7 +61,7 @@ jobs:
           echo "::error::The previous step detected potential secrets in the code. Please review the scan report above."
         shell: bash
 
-  build:
+  code_build:
     needs:
       - pre-commit
     name: Build & Unit Test
@@ -95,26 +93,25 @@ jobs:
       - name: Install dependencies
         run: |
           uv sync --all-extras --dev --frozen
+        shell: bash
 
       - name: Pytest - Run Unit Test
+        continue-on-error: true
         run: |
           uv run pytest
-        continue-on-error: true
+        shell: bash
 
       - name: Minimize UV cache
         run: |
           uv cache prune --ci
+        shell: bash
 
-  scan:
+  code_scan:
     needs:
       - pre-commit
       - secret
     name: Vulnerabilities Scan
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
 
     steps:
@@ -126,7 +123,7 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
-          version: 0.9.0
+          version: 0.9.18
 
       - name: Set up Python
         id: setup-python
@@ -153,31 +150,25 @@ jobs:
           exit 1
         shell: bash
 
-  docker-build:
+  docker_build:
     needs:
-      - build
-    name: Docker Build for ${{ matrix.platform }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-24.04
-            platform: linux/amd64
-          - os: ubuntu-24.04-arm
-            platform: linux/arm64
+      - code_build
+      - secret
+    name: Docker Build & Scan
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     steps:
-      - name: Prepare environment for current platform
-        id: prepare
-        run: |
-          platform=${{ matrix.platform }}
-          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
-        shell: bash
-
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Set up QEMU
+        id: qemu
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
 
       - name: Login to GHCR
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
@@ -186,134 +177,53 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Docker Context for Buildx
-        id: buildx-context
-        run: |
-          docker context create builders
-        shell: bash
-
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
-        with:
-          endpoint: builders
-          platforms: ${{ matrix.platform }}
-
       - name: Docker meta
         id: docker_meta
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         with:
-          images: ${{ env.GHCR_IMAGE }}
+          images: |
+            ghcr.io/${{ github.repository }}
+          flavor: |
+            latest=auto
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}},priority=100
+            type=ref,event=branch,priority=100
+            type=raw,value=gha-${{ github.run_id }},enable=${{github.event_name == 'pull_request'}},priority=200
+            type=raw,value=nightly-${{ github.run_id }},enable=${{github.event_name == 'schedule'}},priority=200
+            type=ref,event=pr,priority=200
+            type=ref,event=tag,priority=200
+            type=sha,value={{sha}},enable={{is_default_branch}},priority=300
 
       - name: Docker Build
         id: build_image
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
-        env:
-          DOCKER_BUILDKIT: 1
         with:
-          platforms: ${{ matrix.platform }}
+          platforms: |
+            linux/amd64
           context: .
           file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
-          outputs: type=image,name=${{ env.GHCR_IMAGE }},push-by-digest=true,name-canonical=true,push=true,oci-mediatypes=true
-          cache-from: type=gha,scope=${{ github.repository }}-${{ github.ref_name }}-${{ matrix.platform }}
-          cache-to: type=gha,scope=${{ github.repository }}-${{ github.ref_name }}-${{ matrix.platform }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           build-args: |
             BUILDKIT_INLINE_CACHE=1
             GIT_COMMIT=${{ github.sha }}
             REPO_URL=${{ github.server_url }}/${{ github.repository }}
 
-      - name: Export digest
+      - name: Find the primary image tag we just pushed, and output it
+        id: image-tag
         run: |
-          mkdir -p /tmp/digests
-          digest="${{ steps.build_image.outputs.digest }}"
-          touch "/tmp/digests/${digest#sha256:}"
+          # shellcheck disable=SC2086
+          echo "image-tag=${{ steps.docker_meta.outputs.version }}" >> $GITHUB_OUTPUT
         shell: bash
 
-      - name: Upload digest
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
-        with:
-          name: digests-${{ env.PLATFORM_PAIR }}
-          path: /tmp/digests/*
-          if-no-files-found: error
-          retention-days: 1
-
-  docker-merge:
+  docker_scan:
     needs:
-      - docker-build
-    name: Docker Merge & Push
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-
-    steps:
-      - name: Login to GHCR
-        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Download digests
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
-        with:
-          path: /tmp/digests
-          pattern: digests-*
-          merge-multiple: true
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
-        with:
-          driver-opts: |
-            network=host
-
-      - name: Docker meta
-        id: docker_meta
-        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
-        with:
-          images: ${{ env.GHCR_IMAGE }}
-          annotations: |
-            type=org.opencontainers.image.description,value=${{ github.event.repository.description || 'No description provided' }}
-          tags: |
-            type=raw,value=main,enable=${{ github.ref_name == 'main' }}
-            type=raw,value=latest,enable=${{ github.ref_name == 'main' }}
-
-      - name: Get execution timestamp with RFC3339 format
-        id: timestamp
-        run: |
-          echo "timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_OUTPUT
-        shell: bash
-
-      - name: Create manifest list and pushs
-        working-directory: /tmp/digests
-        id: manifest-annotate
-        continue-on-error: true
-        run: |
-          docker buildx imagetools create \
-            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            --annotation='index:org.opencontainers.image.description=${{ github.event.repository.description }}' \
-            --annotation='index:org.opencontainers.image.created=${{ steps.timestamp.outputs.timestamp }}' \
-            --annotation='index:org.opencontainers.image.url=${{ github.event.repository.url }}' \
-            --annotation='index:org.opencontainers.image.source=${{ github.event.repository.url }}' \
-            $(printf '${{ env.GHCR_IMAGE }}@sha256:%s ' *) --dry-run
-        shell: bash
-
-      - name: Create manifest list and push without annotations
-        if: steps.manifest-annotate.outcome == 'failure'
-        working-directory: /tmp/digests
-        run: |
-          docker buildx imagetools create  $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ env.GHCR_IMAGE }}@sha256:%s ' *) --dry-run
-      - name: Inspect image
-        id: inspect
-        run: |
-          docker buildx imagetools inspect '${{ env.GHCR_IMAGE }}:${{ steps.docker_meta.outputs.version }}'
-        shell: bash
-
-  docker-scan:
-    needs:
-      - docker-merge
-    name: Docker Scan
+      - docker_build
+    name: Vulnerabilities Scan
     runs-on: ubuntu-24.04
     timeout-minutes: 10
 
@@ -333,8 +243,9 @@ jobs:
 
   gating:
     needs:
-      - docker-scan
-      - scan
+      - secret
+      - code_scan
+      - docker_scan
     name: Gating
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -342,6 +253,5 @@ jobs:
     steps:
 
       - name: Run Gating Check
-        run: |
-          echo Run Gating Check
+        run: echo Run Gating Check
         shell: bash
