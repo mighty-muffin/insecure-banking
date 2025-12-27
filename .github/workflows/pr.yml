@@ -243,9 +243,8 @@ jobs:
 
   gating:
     needs:
-      - secret
-      - code_scan
       - docker_scan
+      - secret
     name: Gating
     runs-on: ubuntu-24.04
     timeout-minutes: 5
