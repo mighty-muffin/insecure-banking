@@ -689,7 +689,7 @@ class TestStorageService(BaseUnitTestCase):
         from django.conf import settings
         import os
 
-        expected_path = os.path.join(settings.BASE_DIR, "web", "static", "resources", "avatars")
+        expected_path = os.path.join(settings.BASE_DIR, "src", "web", "static", "resources", "avatars")
         self.assertEqual(self.storage_service.folder, expected_path)
 
     @patch('web.services.os.path.join')

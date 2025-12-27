@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/python,django,intellij
-# Edit at https://www.toptal.com/developers/gitignore?templates=python,django,intellij
+# User-specific files
+src/web/migrations/
 
 ### Django ###
 *.log
@@ -375,8 +375,3 @@ poetry.toml
 
 # LSP config files
 pyrightconfig.json
-
-# End of https://www.toptal.com/developers/gitignore/api/python,django,intellij
-
-# Snyk Security Extension - AI Rules (auto-generated)
-.github/instructions/snyk_rules.instructions.md

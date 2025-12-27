@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 storage_service = StorageService()
 secretKey = bytes("01234567", "UTF-8")
 checksum = [""]
-resources = os.path.join(settings.BASE_DIR, "web", "static", "resources")
+resources = os.path.join(settings.BASE_DIR, "src", "web", "static", "resources")
 
 
 class Trusted:

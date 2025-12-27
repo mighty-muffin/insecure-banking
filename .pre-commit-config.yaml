@@ -62,6 +62,7 @@ repos:
           ^.github/copilot-instructions.md|
           ^.github/instructions/.*|
           ^.github/prompts/.*|
+          ^docs/.*|
           ^CHANGELOG.md|
           ^README.md
   - repo: https://github.com/adrienverge/yamllint
@@ -72,6 +73,9 @@ repos:
         args:
           - -c
           - .config/.yaml-lint.yml
+        exclude: |
+          (?x)
+          ^mkdocs.yml
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.9.18
     hooks:
