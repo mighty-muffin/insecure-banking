@@ -110,7 +110,11 @@ jobs:
     needs:
       - pre-commit
     name: Vulnerabilities Scan
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
     timeout-minutes: 10
 
     steps:
