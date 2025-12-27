@@ -153,8 +153,6 @@ jobs:
   docker-build:
     needs:
       - build
-      - scan
-      - secret
     name: Docker Build
     runs-on: ${{ matrix.os }}
     strategy:
@@ -168,9 +166,6 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-
       - name: Prepare environment for current platform
         id: prepare
         run: |
@@ -178,9 +173,8 @@ jobs:
           echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
         shell: bash
 
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Login to GHCR
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
@@ -188,6 +182,19 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Context for Buildx
+        id: buildx-context
+        run: |
+          docker context create builders
+        shell: bash
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+        with:
+          endpoint: builders
+          platforms: ${{ matrix.platform }}
 
       - name: Docker meta
         id: docker_meta
@@ -209,14 +216,16 @@ jobs:
       - name: Docker Build
         id: build_image
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        env:
+          DOCKER_BUILDKIT: 1
         with:
           platforms: ${{ matrix.platform }}
           context: .
           file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          outputs: type=image,name=ghcr.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=ghcr.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true,oci-mediatypes=true
+          cache-from: type=gha,scope=${{ github.repository }}-${{ github.ref_name }}-${{ matrix.platform }}
+          cache-to: type=gha,scope=${{ github.repository }}-${{ github.ref_name }}-${{ matrix.platform }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           build-args: |
             BUILDKIT_INLINE_CACHE=1
@@ -231,11 +240,12 @@ jobs:
         shell: bash
 
       - name: Upload digest
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: digests-${{ env.PLATFORM_PAIR }}
           path: /tmp/digests/*
           if-no-files-found: error
+          retention-days: 1
 
   docker-merge:
     needs:
@@ -247,16 +257,6 @@ jobs:
       image-tag: ${{ steps.image-tag.outputs.image-tag }}
 
     steps:
-      - name: Download digests
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
-        with:
-          pattern: digests-*
-          merge-multiple: true
-          path: /tmp/digests
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
-
       - name: Login to GHCR
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
         with:
@@ -264,30 +264,79 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Download digests
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          path: /tmp/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+        with:
+          driver-opts: |
+            network=host
+
       - name: Docker meta
         id: docker_meta
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         with:
           images: |
             ghcr.io/${{ github.repository }}
-          flavor: |
-            latest=auto
+          annotations: |
+            type=org.opencontainers.image.description,value=${{ github.event.repository.description || 'No description provided' }}
           tags: |
-            type=raw,value=latest,enable={{is_default_branch}},priority=100
-            type=ref,event=branch,priority=100
-            type=raw,value=gha-${{ github.run_id }},enable=${{github.event_name == 'pull_request'}},priority=200
-            type=raw,value=nightly-${{ github.run_id }},enable=${{github.event_name == 'schedule'}},priority=200
-            type=ref,event=pr,priority=200
-            type=ref,event=tag,priority=200
-            type=sha,value={{sha}},enable={{is_default_branch}},priority=300
+            type=raw,value=main,enable=${{ github.ref_name == 'main' }}
+            type=raw,value=latest,enable=${{ github.ref_name == 'main' }}
 
-      - name: Create manifest list and push
-        working-directory: /tmp/digests
+      - name: Get execution timestamp with RFC3339 format
+        id: timestamp
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") $(printf 'ghcr.io/${{ github.repository }}@sha256:%s ' *)
-          retention-days: 1
+          echo "timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> $GITHUB_OUTPUT
         shell: bash
 
+      - name: Create manifest list and pushs
+        working-directory: /tmp/digests
+        id: manifest-annotate
+        continue-on-error: true
+        run: |
+              docker buildx imagetools create \
+                $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+                --annotation='index:org.opencontainers.image.description=${{ github.event.repository.description }}' \
+                --annotation='index:org.opencontainers.image.created=${{ steps.timestamp.outputs.timestamp }}' \
+                --annotation='index:org.opencontainers.image.url=${{ github.event.repository.url }}' \
+                --annotation='index:org.opencontainers.image.source=${{ github.event.repository.url }}' \
+                $(printf 'ghcr.io/${{ github.repository }}@sha256:%s ' *)
+        shell: bash
+
+      - name: Create manifest list and push without annotations
+        # This step creates a manifest list for the Docker images built for different platforms.
+        # It uses the docker buildx imagetools create command to create the manifest list.
+        # The manifest list is created without annotations if the previous step fails.
+        # The manifest list is pushed to the GitHub Container Registry (GHCR) with the specified tags.
+        if: steps.manifest-annotate.outcome == 'failure'
+        working-directory: /tmp/digests
+        run: |
+              docker buildx imagetools create  $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+                $(printf 'ghcr.io/${{ github.repository }}@sha256:%s ' *)
+
+      - name: Inspect image
+        # This step inspects the created manifest list to verify its contents.
+        # It uses the docker buildx imagetools inspect command to display information about the manifest list.
+        # The inspection output will show the platforms and tags associated with the manifest list.
+        id: inspect
+        run: |
+          docker buildx imagetools inspect 'ghcr.io/${{ github.repository }}:${{ steps.docker_meta.outputs.version }}'
+        shell: bash
+
+  docker-scan:
+    needs:
+      - docker-merge
+    name: Docker Scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
       - name: Run Container Scan
         id: container
         run: |
@@ -301,16 +350,11 @@ jobs:
           exit 1
         shell: bash
 
-      - name: Find the primary image tag we just pushed, and output it
-        id: image-tag
-        run: |
-          echo "image-tag=${{ steps.docker_meta.outputs.version }}" >> $GITHUB_OUTPUT
-        shell: bash
-
   gating:
     needs:
-      - build
-      - docker-merge
+      - docker-scan
+      - scan
+      - secret
     name: Gating
     runs-on: ubuntu-24.04
     timeout-minutes: 5
