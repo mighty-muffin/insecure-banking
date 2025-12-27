@@ -65,7 +65,7 @@ jobs:
           echo "::error::The previous step detected potential secrets in the code. Please review the scan report above."
         shell: bash
 
-  build:
+  code_build:
     if: ${{ ! startsWith(github.event.head_commit.message, 'bump:') }}
     needs:
       - pre-commit
@@ -86,7 +86,7 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
-          version: 0.9.0
+          version: 0.9.18
 
       - name: Setup Python ${{ matrix.python-version }}
         id: setup-python
@@ -97,17 +97,19 @@ jobs:
       - name: Install dependencies
         run: |
           uv sync --all-extras --dev --frozen
+        shell: bash
 
       - name: Pytest - Run Unit Test
         run: |
           uv run pytest
-        continue-on-error: true
+        shell: bash
 
       - name: Minimize UV cache
         run: |
           uv cache prune --ci
+        shell: bash
 
-  scan:
+  code_scan:
     if: ${{ ! startsWith(github.event.head_commit.message, 'bump:') }}
     needs:
       - pre-commit
@@ -116,7 +118,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, ubuntu-24.04-arm]
+        os: [ubuntu-24.04]
     timeout-minutes: 10
 
     steps:
@@ -128,7 +130,7 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
-          version: 0.9.0
+          version: 0.9.18
 
       - name: Set up Python
         id: setup-python
@@ -155,14 +157,14 @@ jobs:
           exit 1
         shell: bash
 
-  docker:
+  docker_build:
     if: ${{ ! startsWith(github.event.head_commit.message, 'bump:') }}
     needs:
-      - build
-      - scan
-      - secret
-    name: Docker Build & Scan
+      - code_build
+    name: Container Build
     runs-on: ubuntu-24.04
+    outputs:
+      image-tag: ${{ steps.image-tag.outputs.image-tag }}
     timeout-minutes: 15
 
     steps:
@@ -220,10 +222,86 @@ jobs:
             GIT_COMMIT=${{ github.sha }}
             REPO_URL=${{ github.server_url }}/${{ github.repository }}
 
+      - name: Find the primary image tag we just pushed, and output it
+        id: image-tag
+        run: |
+          # shellcheck disable=SC2086
+          echo "image-tag=${{ steps.docker_meta.outputs.version }}" >> $GITHUB_OUTPUT
+        shell: bash
+
+  docker_smoke:
+    if: ${{ ! startsWith(github.event.head_commit.message, 'bump:') }}
+    needs:
+      - docker_build
+    name: Container Smoke Test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Login to GHCR
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull and Run Container
+        run: |
+          IMAGE_URI="ghcr.io/${{ github.repository }}:${{ needs.docker_build.outputs.image-tag }}"
+          docker pull "$IMAGE_URI"
+          docker run --detach --publish 8000:8000 --name insecure-banking-smoke "$IMAGE_URI"
+        shell: bash
+
+      - name: Wait for Healthcheck
+        id: smoke
+        run: |
+          timeout=60
+          start_time=$(date +%s)
+          while true; do
+            current_time=$(date +%s)
+            if [ $((current_time - start_time)) -gt $timeout ]; then
+              echo "Timeout waiting for container to be healthy"
+              docker logs insecure-banking-smoke
+              exit 1
+            fi
+
+            status=$(docker inspect --format='{{.State.Health.Status}}' insecure-banking-smoke)
+            if [ "$status" == "healthy" ]; then
+              echo "Container is healthy"
+              exit 0
+            fi
+
+            if [ "$status" == "unhealthy" ]; then
+               echo "Container is unhealthy"
+               docker logs insecure-banking-smoke
+               exit 1
+            fi
+
+            echo "Waiting for healthcheck... ($((current_time - start_time))s)"
+            sleep 2
+          done
+        shell: bash
+
+      - name: Check status of potentially failing step and issue warning
+        if: steps.smoke.outcome == 'failure'
+        run: |
+          echo "::error::The previous step detected potential failure in the code. Please review the report above."
+          exit 1
+        shell: bash
+
+  docker_scan:
+    if: ${{ ! startsWith(github.event.head_commit.message, 'bump:') }}
+    needs:
+      - docker_build
+    name: Container Vulnerability Scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
       - name: Run Container Scan
         id: container
         run: |
-          echo Run SAST
+          echo Run Container Scan
         shell: bash
 
       - name: Check status of potentially failing step and issue warning
@@ -233,17 +311,13 @@ jobs:
           exit 1
         shell: bash
 
-      - name: Find the primary image tag we just pushed, and output it
-        id: image-tag
-        run: |
-          # shellcheck disable=SC2086
-          echo "image-tag=${{ steps.docker_meta.outputs.version }}" >> $GITHUB_OUTPUT
-        shell: bash
-
   gating:
+    if: ${{ ! startsWith(github.event.head_commit.message, 'bump:') }}
     needs:
-      - build
-      - docker
+      - code_scan
+      - docker_scan
+      - docker_smoke
+      - secret
     name: Gating
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -258,8 +332,6 @@ jobs:
     if: ${{ ! startsWith(github.event.head_commit.message, 'bump:') }}
     needs:
       - gating
-      - build
-
     name: Release Version
     runs-on: ubuntu-24.04
     timeout-minutes: 5
