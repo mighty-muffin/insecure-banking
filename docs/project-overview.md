@@ -119,10 +119,3 @@ This application contains intentional security vulnerabilities and should:
 ## License and Usage
 
 This project is designed for educational and testing purposes. Users should be aware that the application is intentionally insecure and should be handled accordingly.
-
-## Related Documentation
-
-- [Application Architecture](architecture/overview.md)
-- [Development Setup](development/setup.md)
-- [Security Vulnerabilities](architecture/security-vulnerabilities.md)
-- [Testing Overview](testing/overview.md)

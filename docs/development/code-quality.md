@@ -1,83 +1,51 @@
 # Code Quality Tools
 
+Code quality is the measure of how reliable, efficient, readable, and maintainable software code is, encompassing its ability to function correctly, be understood, modified, and extended easily by developers while meeting user needs and security standards. It's about more than just being bug-free; high-quality code is well-structured, performant, testable, and adheres to best practices, making it a valuable asset rather than a liability.
+
+## Pre-Commit
+
+[pre-commit](https://github.com/pre-commit/pre-commit); a framework for managing and maintaining multi-language pre-commit hooks.
+[prek](https://github.com/j178/prek); alternatively a better `pre-commit`, re-engineered in Rust.
+
+```bash
+pre-commit install --allow-missing-config
+pre-commit autoupdate # Update hooks
+pre-commit run --all-files # All files
+pre-commit run ruff-check # Specific hook
+```
+
 ## Ruff
 
-Modern Python linter and formatter.
-
-### Configuration
-
-In `pyproject.toml`:
-```toml
-[tool.ruff]
-line-length = 128
-target-version = "py310"
-src = ["src"]
-
-[tool.ruff.lint]
-extend-select = [
-    "E",   # pycodestyle errors
-    "F",   # pyflakes
-    "I",   # isort
-    "UP",  # pyupgrade
-    "PLR", # pylint refactor
-]
-```
-
-### Usage
+[ruff](https://github.com/astral-sh/ruff); an extremely fast Python linter and code formatter, written in Rust.
 
 ```bash
-# Check code
-uv run ruff check src/
-
-# Fix issues
-uv run ruff check --fix src/
-
-# Format code
-uv run ruff format src/
+uv run ruff check src/ # Check code
+uv run ruff check --fix # Fix issues
+uv run ruff format # Format code
 ```
 
-## Pre-commit
+## Ty
 
-Git hooks for code quality.
-
-### Setup
+[ty](https://github.com/astral-sh/ty); an extremely fast Python type checker and language server, written in Rust.
 
 ```bash
-pre-commit install
+uv run ty check src/ # Check code
 ```
 
-### Run
+## Pytest
+
+The [pytest](https://github.com/pytest-dev/pytest) framework makes it easy to write small tests, yet scales to support complex functional testing.
+Couple of add-on are installed (pytest-cov, pytest-django, pytest-mock, pytest-xdist) to improve the experience.
 
 ```bash
-# All files
-pre-commit run --all-files
-
-# Specific hook
-pre-commit run ruff-check
-```
-
-## pytest
-
-Testing framework with coverage.
-
-### Run Tests
-
-```bash
-# All tests
-uv run pytest
-
-# With coverage
-uv run pytest --cov=src
-
-# Specific marker
-pytest -m unit
+uv run pytest # All tests
+uv run pytest --cov=src # With coverage
+uv run pytest -m unit # Specific marker
 ```
 
 ## Commitizen
 
-Conventional commits enforcement.
-
-### Commit Format
+[Commitizen](https://github.com/commitizen); a conventional commits enforcement framework
 
 ```text
 <type>(<scope>): <subject>
@@ -88,15 +56,11 @@ Conventional commits enforcement.
 ```
 
 Types:
+
+- chore: Maintenance
+- docs: Documentation
 - feat: New feature
 - fix: Bug fix
-- docs: Documentation
-- style: Formatting
 - refactor: Code restructuring
+- style: Formatting
 - test: Testing
-- chore: Maintenance
-
-## Related Documentation
-
-- [Pre-commit Hooks](../cicd/pre-commit.md)
-- [Testing Overview](../testing/overview.md)
