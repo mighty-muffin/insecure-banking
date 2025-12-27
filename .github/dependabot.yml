@@ -1,11 +1,15 @@
 ---
 version: 2
 updates:
-
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    ignore:
+      - dependency-name: "python"
+        versions: ["3.11.x", "3.12.x", ">=4.0.0"]
+      - dependency-name: "python"
+        versions: [">3.10"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
