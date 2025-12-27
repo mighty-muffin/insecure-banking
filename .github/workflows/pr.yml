@@ -96,7 +96,6 @@ jobs:
         shell: bash
 
       - name: Pytest - Run Unit Test
-        continue-on-error: true
         run: |
           uv run pytest
         shell: bash
