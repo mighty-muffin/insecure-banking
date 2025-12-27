@@ -22,8 +22,8 @@
      --build-arg GIT_COMMIT=$(git rev-parse --short HEAD) \
      --build-arg REPO_URL=$(git config --get remote.origin.url | sed 's/git@/https:\/\//; s/.com:/.com\//; s/\.git$//') \
      --file Dockerfile --no-cache --tag insecure-bank-py .
-   docker run --detach --publish 8000:8000 --name insecure-bank-py insecure-bank-py
    docker stop insecure-bank-py && docker rm insecure-bank-py
+   docker run --detach --publish 8000:8000 --name insecure-bank-py insecure-bank-py
    docker logs insecure-bank-py
    ```
 
