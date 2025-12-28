@@ -1,10 +1,77 @@
-.coverage
-.env*
-.pytest_cache/
-.ruff_cache
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Python cache
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
 .venv
-*.log
+venv/
+ENV/
+env/
+
+# Testing
+.coverage
+.pytest_cache/
+.tox/
 coverage.xml
 htmlcov/
-db.sqlite3
+.nyc_output
 tests/
+
+# Linting and formatting
+.ruff_cache
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Environment files
+.env
+.env.*
+*.log
+
+# Database
+db.sqlite3
+*.db
+
+# Documentation
+*.md
+docs/
+mkdocs.yml
+
+# CI/CD
+.github/
+.pre-commit-config.yaml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# Project specific
+data/
+scripts/
+.config/
+.python-version
+pyproject.toml
+uv.lock
+CHANGELOG.md
+README.md
