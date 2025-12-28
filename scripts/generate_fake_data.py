@@ -13,12 +13,23 @@ from typing import List, Tuple
 
 from faker import Faker
 
+# Common weak passwords often found in password lists
+COMMON_WEAK_PASSWORDS = [
+    'password', 'password123', '123456', '12345678', 'qwerty',
+    'abc123', 'monkey', 'letmein', 'dragon', 'master',
+    'sunshine', 'princess', 'welcome', 'shadow', 'football',
+    'iloveyou', 'admin', 'password1', '123456789', 'baseball',
+    'trustno1', 'superman', 'hello', 'freedom', 'whatever',
+    'ninja', 'mustang', 'starwars', 'cheese', 'summer',
+]
+
 
 def generate_accounts(fake: Faker, num_accounts: int = 7) -> List[Tuple]:
     """
     Generate fake user accounts with username, name, surname, and password.
     Uses Quebec French localization for authentic French Canadian names.
-    Always includes 'Guillaume Bourbonnais' as the first account.
+    Always includes 'Guillaume Bourbonnais' as the first account with
+    password 'timinou'. Other accounts get common weak passwords.
 
     Parameters:
         fake (Faker): Faker instance for generating fake data.
@@ -31,8 +42,8 @@ def generate_accounts(fake: Faker, num_accounts: int = 7) -> List[Tuple]:
     accounts = []
     used_usernames = set()
 
-    # Always add Guillaume Bourbonnais as the first account
-    accounts.append(('guillaume', 'Guillaume', 'Bourbonnais', 'test'))
+    # Always add Guillaume Bourbonnais as the first account with 'timinou'
+    accounts.append(('guillaume', 'Guillaume', 'Bourbonnais', 'timinou'))
     used_usernames.add('guillaume')
 
     # Generate remaining accounts randomly
@@ -46,8 +57,8 @@ def generate_accounts(fake: Faker, num_accounts: int = 7) -> List[Tuple]:
                 break
 
         surname = fake.last_name()
-        # Using 'test' as password to match original data pattern
-        password = 'test'
+        # Use a common weak password from the list
+        password = random.choice(COMMON_WEAK_PASSWORDS)
         accounts.append((username, first_name, surname, password))
 
     return accounts

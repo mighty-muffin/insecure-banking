@@ -50,7 +50,7 @@ def test_transfer_flow(page: Page, live_server):
     expect(page.locator("h4")).to_contain_text("DETAILS CONFIRMATION")
     expect(page.locator("td", has_text="1001")).to_be_visible()
     expect(page.locator("td", has_text="9999")).to_be_visible()
-    expect(page.locator("td", has_text="100.0 €")).to_be_visible()
+    expect(page.locator("td", has_text="100.0 $")).to_be_visible()
 
     # Confirm Transfer
     page.click("button[name='action'][value='confirm']")
@@ -60,4 +60,4 @@ def test_transfer_flow(page: Page, live_server):
     expect(page.locator(".alert-success")).to_contain_text("Success! You have successfully made the transfer.")
     expect(page.locator("td", has_text="1001")).to_be_visible()
     expect(page.locator("td", has_text="9999")).to_be_visible()
-    expect(page.locator("td", has_text="100.0 €")).to_be_visible()
+    expect(page.locator("td", has_text="100.0 $")).to_be_visible()
