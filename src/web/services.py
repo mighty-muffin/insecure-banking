@@ -36,6 +36,8 @@ class AccountService(BaseBackend):
     def authenticate(self, request, username=None, password=None):
         username = request.POST.get("username")
         password = request.POST.get("password")
+        if not username or not password:
+            return None
         accounts = self.find_users_by_username_and_password(username, password)
         if len(accounts) == 0:
             return None
