@@ -13,10 +13,10 @@ def test_activity_view(page: Page, live_server):
     username = "activityuser"
     password = "password123"
     account_number = "2001"
-    
+
     # Login
     login_user(page, live_server.url, username, password)
-    
+
     # Create a cash account
     CashAccount.objects.create(
         number=account_number,
@@ -24,7 +24,7 @@ def test_activity_view(page: Page, live_server):
         description="Activity Account",
         availableBalance=500.0
     )
-    
+
     # Create some transactions
     Transaction.objects.create(
         number=account_number,
@@ -40,11 +40,11 @@ def test_activity_view(page: Page, live_server):
         availableBalance=450.0,
         date=datetime.now()
     )
-    
+
     # Navigate to Activity page
     page.click("text=Accounts activity")
     expect(page).to_have_url(f"{live_server.url}/activity")
-    
+
     # Verify transactions are listed
     # Assuming the table displays description and amount
     expect(page.locator("body")).to_contain_text("Deposit")

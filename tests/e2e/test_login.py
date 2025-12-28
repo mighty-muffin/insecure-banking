@@ -28,7 +28,7 @@ def test_login_success(page: Page, live_server):
 
     # Assert we are redirected to dashboard
     expect(page).to_have_url(f"{live_server.url}/dashboard")
-    
+
     # Assert dashboard header is visible
     expect(page.locator("h2")).to_contain_text("DASHBOARD")
 
@@ -36,7 +36,7 @@ def test_login_success(page: Page, live_server):
 def test_john_login(page: Page, live_server):
     username = "john"
     password = "test"
-    
+
     # Create the Account for John
     Account.objects.create(
         username=username,
@@ -55,7 +55,6 @@ def test_john_login(page: Page, live_server):
 
     # Assert we are redirected to dashboard
     expect(page).to_have_url(f"{live_server.url}/dashboard")
-    
+
     # Assert dashboard header is visible
     expect(page.locator(".heading h2")).to_contain_text("DASHBOARD")
-
