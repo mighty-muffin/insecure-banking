@@ -41,7 +41,7 @@ RUN apk add --no-cache curl libffi tini
 COPY --from=builder /app/.venv /app/.venv
 
 COPY src /app/src
-COPY src/manage.py /app/manage.py
+COPY manage.py /app/manage.py
 
 RUN chown -R appuser:appgroup /app
 
@@ -55,4 +55,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8000/login || exit 1
 
 ENTRYPOINT ["tini", "--"]
-CMD ["python", "/app/manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

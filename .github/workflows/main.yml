@@ -101,6 +101,7 @@ jobs:
 
       - name: Pytest - Run Unit Test
         run: |
+          uv run playwright install --with-deps
           uv run pytest
         shell: bash
 

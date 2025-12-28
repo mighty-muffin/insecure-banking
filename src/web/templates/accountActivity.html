@@ -86,16 +86,16 @@
                                                     <td>{{ transfer.description }}</td>
 
                                                     {% if transfer.amount > 0 %}
-                                                        <td>+{{ transfer.amount }} EUR</td>
+                                                        <td>+{{ transfer.amount }} CAD</td>
                                                         <td></td>
                                                     {% endif %}
 
                                                     {% if transfer.amount < 0 %}
                                                         <td></td>
-                                                        <td>{{ transfer.amount }} EUR</td>
+                                                        <td>{{ transfer.amount }} CAD</td>
                                                     {% endif %}
 
-                                                    <td>{% if transfer.availableBalance > 0 %}+{% endif %}{{ transfer.availableBalance }} EUR</td>
+                                                    <td>{% if transfer.availableBalance > 0 %}+{% endif %}{{ transfer.availableBalance }} CAD</td>
                                                 </tr>
                                             {% endfor %}
                                             </tbody>

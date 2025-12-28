@@ -238,8 +238,8 @@ class TestAccountService(BaseUnitTestCase):
 
     def test_authenticate_uses_request_post_data(self):
         """Test that authenticate method uses request.POST data."""
-        # Create request without POST data
-        request = self.factory.get('/login')
+        # Create request with POST data
+        request = self.factory.post('/login', {'username': 'post_user', 'password': 'post_pass'})
 
         with patch.object(self.account_service, 'find_users_by_username_and_password') as mock_find:
             mock_find.return_value = []
@@ -247,8 +247,8 @@ class TestAccountService(BaseUnitTestCase):
             # Even with parameters, it should use request.POST
             result = self.account_service.authenticate(request, 'param_user', 'param_pass')
 
-            # Should call with None values since no POST data
-            mock_find.assert_called_once_with(None, None)
+            # Should call with POST values, not the parameters passed to authenticate
+            mock_find.assert_called_once_with('post_user', 'post_pass')
             self.assertIsNone(result)
 
 

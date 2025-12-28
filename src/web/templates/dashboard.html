@@ -67,7 +67,7 @@
                                                     <td>{{ account.number }}</td>
                                                     <td>{{ account.description }}</td>
                                                     <td>{% if account.availableBalance > 0 %}+{% endif %}{{ account.availableBalance }}
-                                                        EUR
+                                                        CAD
                                                     </td>
                                                     <td><a href="/activity/{{ account.number }}/detail"
                                                            class="btn btn-primary btn-xs"><i class="fa fa-search"></i>
@@ -111,7 +111,7 @@
                                                     </td>
                                                     <td>{{ account.description }}</td>
                                                     <td>{% if account.availableBalance > 0 %}+{% endif %}{{ account.availableBalance }}
-                                                        EUR
+                                                        CAD
                                                     </td>
                                                     <td><a href="/activity/credit?number={{ account.number }}"
                                                            class="btn btn-primary btn-xs"><i class="fa fa-search"></i>
