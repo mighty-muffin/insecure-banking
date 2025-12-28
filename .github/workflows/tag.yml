@@ -33,9 +33,7 @@ jobs:
 
       - name: Get Version
         id: tag_name
-        run: |
-          echo "current_version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-        shell: bash
+        run: echo "current_version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
       - name: Get CHANGELOG
         id: generate_notes

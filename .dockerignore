@@ -1,10 +1,49 @@
-.coverage
-.env*
+# Version control
+.git
+.gitignore
+.github
+
+# Python cache and virtual environments
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
 .pytest_cache/
 .ruff_cache
-.venv
-*.log
+*.egg-info
+
+# Test and coverage
+tests/
+.coverage
 coverage.xml
 htmlcov/
+.nyc_output
+
+# IDE and editors
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Logs and databases
+*.log
 db.sqlite3
-tests/
+
+# Environment files
+.env*
+
+# Documentation
+docs/
+README.md
+CHANGELOG.md
+mkdocs.yml
+
+# Build artifacts
+dist/
+build/
+*.egg
+
+# CI/CD
+.pre-commit-config.yaml
