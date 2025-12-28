@@ -639,7 +639,7 @@ class TransferView(TemplateView):
         cash_accounts = CashAccountService.find_cash_accounts_by_username(principal.username)
         accounts = AccountService.find_users_by_username(principal.username)
         aux = transfer.amount
-        if aux == 0.0:
+        if aux is None or aux == 0.0:
             template = loader.get_template("newTransfer.html")
             context = {
                 "account": accounts[0],
