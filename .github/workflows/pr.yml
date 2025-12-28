@@ -97,7 +97,8 @@ jobs:
 
       - name: Pytest - Run Unit Test
         run: |
-          uv run pytest
+          uv run playwright install --with-deps
+          uv run pytest -m "not e2e"
         shell: bash
 
       - name: Minimize UV cache
@@ -309,6 +310,7 @@ jobs:
       - docker_scan
       - docker_smoke
       - secret
+      - e2e_test
     name: Gating
     runs-on: ubuntu-24.04
     timeout-minutes: 5
