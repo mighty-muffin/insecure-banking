@@ -28,6 +28,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
+      - name: Run Sanity Check
+        uses: ./.github/actions/sanity
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          detect-changes: "false" # DO NOT ENABLE THIS ACTION
+
       - name: Run Pre-Commit Checks
         uses: j178/prek-action@91fd7d7cf70ae1dee9f4f44e7dfa5d1073fe6623 # v1.0.11
         env:
