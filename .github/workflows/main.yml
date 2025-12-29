@@ -156,6 +156,7 @@ jobs:
         id: sast
         run: |
           echo Run SAST
+          echo "::warning::Must implement a code scanning mechanism."
           exit 1
         shell: bash
         continue-on-error: true
@@ -164,6 +165,7 @@ jobs:
         id: sca
         run: |
           echo Run SCA
+          echo "::warning::Must implement a dependencies scanning mechanism."
           exit 1
         shell: bash
         continue-on-error: true
@@ -313,6 +315,7 @@ jobs:
         id: container
         run: |
           echo Run Container Scan
+          echo "::warning::Must implement a container scanning mechanism."
           exit 1
         shell: bash
         continue-on-error: true
