@@ -2,7 +2,7 @@
 import os
 from unittest.mock import Mock, patch, mock_open
 import pytest
-from web.context_processors import (
+from apps.core.context_processors import (
     version_info,
     get_git_commit,
     get_repo_url,

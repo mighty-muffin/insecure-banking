@@ -31,7 +31,8 @@ def authenticated_client(client, user_data):
 def full_database_setup(db):
     """Complete database setup with all models."""
     from django.contrib.auth.models import User
-    from web.models import Account, Transaction
+    from apps.accounts.models import Account
+    from apps.banking.models import Transaction
 
     # Create multiple users
     users = []

@@ -25,7 +25,8 @@ import pytest
 from unittest.mock import patch, Mock, call
 from django.test import TestCase
 
-from web.views import to_traces, Trusted, Untrusted, get_file_checksum
+from apps.banking.views import to_traces, Trusted, Untrusted, get_file_checksum
+from apps.transfers.views import to_traces
 
 
 @pytest.mark.security

@@ -41,7 +41,7 @@ class TestDatabaseManager:
     @staticmethod
     def populate_test_data():
         """Populate database with standard test data."""
-        from web.models import Account, CashAccount, CreditAccount, Transfer, Transaction
+        from apps.accounts.models import Account, CashAccount, CreditAccount, Transfer, Transaction
         from datetime import datetime
 
         # Create test accounts
@@ -142,7 +142,7 @@ def create_test_data_set(data_type="minimal"):
 
 def _create_minimal_test_data():
     """Create minimal test data set."""
-    from web.models import Account, CashAccount
+    from apps.accounts.models import Account, CashAccount
 
     account = Account.objects.create(
         username="testuser",
@@ -166,7 +166,7 @@ def _create_minimal_test_data():
 
 def _create_security_test_data():
     """Create test data specifically for security testing."""
-    from web.models import Account, CashAccount, Transfer
+    from apps.accounts.models import Account, CashAccount, Transfer
     from datetime import datetime
 
     # Create accounts with various security test scenarios

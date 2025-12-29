@@ -60,7 +60,7 @@ class TestDjangoTestCase(TestCase):
 
     def test_django_testcase_functionality(self):
         """Test Django TestCase functionality."""
-        from web.models import Account
+        from apps.accounts.models import Account
 
         account = Account.objects.create(
             username="djangotest",
@@ -76,7 +76,7 @@ class TestDjangoTestCase(TestCase):
 @pytest.mark.django_db
 def test_model_creation_and_queries():
     """Test basic model operations work correctly."""
-    from web.models import Account, CashAccount
+    from apps.accounts.models import Account, CashAccount
 
     # Create account
     account = Account.objects.create(
@@ -106,7 +106,7 @@ def test_model_creation_and_queries():
 @pytest.mark.django_db
 def test_database_transactions():
     """Test database transaction handling."""
-    from web.models import Account
+    from apps.accounts.models import Account
     from django.db import transaction
 
     initial_count = Account.objects.count()

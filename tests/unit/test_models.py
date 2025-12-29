@@ -5,7 +5,9 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 from unittest.mock import patch, Mock
 
-from web.models import Account, CashAccount, CreditAccount, Transfer, Transaction
+from apps.accounts.models import Account
+from apps.banking.models import CashAccount, CreditAccount, Transaction
+from apps.transfers.models import Transfer
 from tests.model_helpers import (
     ModelTestHelpers, AccountTestHelpers, CashAccountTestHelpers,
     TransferTestHelpers, ValidationTestHelpers
@@ -409,7 +411,7 @@ class TestCashAccountPytest:
 
         # Test assert_balance_change helper
         # Update via a separate instance or direct DB update to keep cash_account stale
-        from web.models import CashAccount
+        from apps.banking.models import CashAccount
         CashAccount.objects.filter(pk=cash_account.pk).update(availableBalance=cash_account.availableBalance + 50.00)
 
         cash_account.refresh_from_db()

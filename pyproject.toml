@@ -78,12 +78,11 @@ version_files = [
 
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "config.test_settings"
-python_paths = ["src"]
+DJANGO_SETTINGS_MODULE = "insecure_banking.test_settings"
 testpaths = ["tests"]
-pythonpath = "src"
 addopts = [
-    "--cov=src",
+    "--cov=insecure_banking",
+    "--cov=apps",
     "--cov-report=term-missing",
     "--cov-report=html:tests/coverage/html",
     "--cov-report=xml:tests/coverage/coverage.xml",

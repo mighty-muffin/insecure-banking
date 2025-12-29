@@ -24,7 +24,8 @@ from django.test import TestCase, Client
 from django.conf import settings
 from unittest.mock import patch, Mock
 
-from web.models import Account, CashAccount, CreditAccount
+from apps.accounts.models import Account
+from apps.banking.models import CashAccount, CreditAccount
 
 
 @pytest.mark.integration
@@ -77,8 +78,8 @@ class TestAdminFlow(TestCase):
             )
             self.test_accounts.append(account)
 
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.AccountService.find_all_users')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.accounts.services.AccountService.find_all_users')
     def test_admin_account_management_workflow(self, mock_find_all, mock_find_by_username):
         """Test admin user account management workflow."""
         # Mock service responses
@@ -102,8 +103,8 @@ class TestAdminFlow(TestCase):
         self.assertEqual(context['account'], self.admin_account)
         self.assertEqual(len(context['accounts']), 4)  # admin + 3 test accounts
 
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.AccountService.find_all_users')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.accounts.services.AccountService.find_all_users')
     def test_admin_account_listing_functionality(self, mock_find_all, mock_find_by_username):
         """Test admin account listing and details functionality."""
         # Mock service responses with multiple accounts

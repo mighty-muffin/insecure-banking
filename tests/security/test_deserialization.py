@@ -26,7 +26,7 @@ import pytest
 from unittest.mock import patch, Mock, mock_open
 from django.test import TestCase
 
-from web.views import Untrusted, Trusted
+from apps.banking.views import Untrusted, Trusted
 
 
 # Wrapper for os.system to allow mocking in tests

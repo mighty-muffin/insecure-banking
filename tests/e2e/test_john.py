@@ -1,7 +1,7 @@
 import os
 import pytest
 from playwright.sync_api import Page, expect
-from web.models import Account
+from apps.accounts.models import Account
 from tests.e2e.utils import login_user
 
 # Allow sync DB access in async context

@@ -105,7 +105,7 @@ class AccountTestHelpers:
     @staticmethod
     def create_test_account(username: str = None, **kwargs):
         """Create test Account with optional parameters."""
-        from web.models import Account
+        from apps.accounts.models import Account
 
         defaults = {
             'username': username or f"testuser_{ModelTestHelpers._random_string(8)}",
@@ -148,7 +148,7 @@ class CashAccountTestHelpers:
     @staticmethod
     def create_test_cash_account(username: str = None, **kwargs):
         """Create test CashAccount with optional parameters."""
-        from web.models import CashAccount
+        from apps.banking.models import CashAccount
 
         defaults = {
             'number': ModelTestHelpers._random_account_number(),
@@ -177,7 +177,7 @@ class TransferTestHelpers:
     def create_test_transfer(from_account: str = None, to_account: str = None,
                            username: str = None, **kwargs):
         """Create test Transfer with optional parameters."""
-        from web.models import Transfer
+        from apps.transfers.models import Transfer
 
         defaults = {
             'fromAccount': from_account or ModelTestHelpers._random_account_number(),

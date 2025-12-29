@@ -23,8 +23,8 @@ import pytest
 from unittest.mock import patch, Mock, MagicMock
 from django.test import TestCase
 
-from web.models import Account, CashAccount, CreditAccount
-from web.services import AccountService, CashAccountService, CreditAccountService
+from apps.accounts.models import Account, CashAccount, CreditAccount
+from apps.accounts.services import AccountService, CashAccountService, CreditAccountService
 
 
 @pytest.mark.security

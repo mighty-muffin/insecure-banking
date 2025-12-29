@@ -11,7 +11,7 @@ from web.services import (
     AccountService, CashAccountService, CreditAccountService,
     ActivityService, TransferService, StorageService
 )
-from web.models import Account, CashAccount, CreditAccount, Transaction, Transfer
+from apps.accounts.models import Account, CashAccount, CreditAccount, Transaction, Transfer
 from tests.base import BaseUnitTestCase
 
 
@@ -32,8 +32,8 @@ class TestAccountService(BaseUnitTestCase):
             'password': 'testpass123'
         }
 
-    @patch('web.services.User.objects.get')
-    @patch('web.services.AccountService.find_users_by_username_and_password')
+    @patch('apps.accounts.auth.User.objects.get')
+    @patch('apps.accounts.services.AccountService.find_users_by_username_and_password')
     def test_authenticate_existing_user_success(self, mock_find_users, mock_get_user):
         """Test successful authentication with existing user."""
         # Setup mocks
@@ -58,7 +58,7 @@ class TestAccountService(BaseUnitTestCase):
         mock_find_users.assert_called_once_with('testuser', 'testpass123')
         mock_get_user.assert_called_once_with(username='testuser')
 
-    @patch('web.services.AccountService.find_users_by_username_and_password')
+    @patch('apps.accounts.services.AccountService.find_users_by_username_and_password')
     def test_authenticate_new_user_creation(self, mock_find_users):
         """Test authentication creates new Django user when not exists."""
         # Setup mocks
@@ -92,7 +92,7 @@ class TestAccountService(BaseUnitTestCase):
             mock_user_instance.save.assert_called_once()
             self.assertEqual(result, mock_user_instance)
 
-    @patch('web.services.AccountService.find_users_by_username_and_password')
+    @patch('apps.accounts.services.AccountService.find_users_by_username_and_password')
     def test_authenticate_john_gets_superuser(self, mock_find_users):
         """Test that username 'john' gets superuser privileges."""
         # Setup mocks
@@ -118,7 +118,7 @@ class TestAccountService(BaseUnitTestCase):
             self.assertTrue(mock_user_instance.is_superuser)
             self.assertTrue(mock_user_instance.is_staff)
 
-    @patch('web.services.AccountService.find_users_by_username_and_password')
+    @patch('apps.accounts.services.AccountService.find_users_by_username_and_password')
     def test_authenticate_no_account_found(self, mock_find_users):
         """Test authentication returns None when no account found."""
         # Setup mock to return empty list
@@ -134,7 +134,7 @@ class TestAccountService(BaseUnitTestCase):
         self.assertIsNone(result)
         mock_find_users.assert_called_once_with('nonexistent', 'wrongpass')
 
-    @patch('web.services.User.objects.get')
+    @patch('apps.accounts.auth.User.objects.get')
     def test_get_user_success(self, mock_get):
         """Test get_user returns user when found."""
         mock_user = Mock()
@@ -146,7 +146,7 @@ class TestAccountService(BaseUnitTestCase):
         self.assertEqual(result, mock_user)
         mock_get.assert_called_once_with(pk=1)
 
-    @patch('web.services.User.objects.get')
+    @patch('apps.accounts.auth.User.objects.get')
     def test_get_user_not_found(self, mock_get):
         """Test get_user returns None when user not found."""
         from django.contrib.auth.models import User
@@ -157,7 +157,7 @@ class TestAccountService(BaseUnitTestCase):
         self.assertIsNone(result)
         mock_get.assert_called_once_with(pk=999)
 
-    @patch('web.models.Account.objects.raw')
+    @patch('apps.accounts.models.Account.objects.raw')
     def test_find_users_by_username_and_password(self, mock_raw):
         """Test find_users_by_username_and_password SQL injection vulnerability."""
         mock_accounts = [Mock(), Mock()]
@@ -170,7 +170,7 @@ class TestAccountService(BaseUnitTestCase):
         mock_raw.assert_called_once_with(expected_sql)
         self.assertEqual(result, mock_accounts)
 
-    @patch('web.models.Account.objects.raw')
+    @patch('apps.accounts.models.Account.objects.raw')
     def test_find_users_by_username_and_password_sql_injection(self, mock_raw):
         """Test SQL injection vulnerability in find_users_by_username_and_password."""
         mock_accounts = [Mock()]
@@ -191,7 +191,7 @@ class TestAccountService(BaseUnitTestCase):
         self.assertIn("DROP TABLE", called_sql)
         self.assertIn("--", called_sql)
 
-    @patch('web.models.Account.objects.raw')
+    @patch('apps.accounts.models.Account.objects.raw')
     def test_find_users_by_username(self, mock_raw):
         """Test find_users_by_username SQL injection vulnerability."""
         mock_accounts = [Mock(), Mock()]
@@ -203,7 +203,7 @@ class TestAccountService(BaseUnitTestCase):
         mock_raw.assert_called_once_with(expected_sql)
         self.assertEqual(result, mock_accounts)
 
-    @patch('web.models.Account.objects.raw')
+    @patch('apps.accounts.models.Account.objects.raw')
     def test_find_users_by_username_sql_injection(self, mock_raw):
         """Test SQL injection vulnerability in find_users_by_username."""
         mock_accounts = [Mock()]
@@ -218,7 +218,7 @@ class TestAccountService(BaseUnitTestCase):
         called_sql = mock_raw.call_args[0][0]
         self.assertIn("SELECT * FROM web_account WHERE", called_sql)
 
-    @patch('web.models.Account.objects.raw')
+    @patch('apps.accounts.models.Account.objects.raw')
     def test_find_all_users(self, mock_raw):
         """Test find_all_users method."""
         mock_accounts = [Mock() for _ in range(5)]
@@ -259,7 +259,7 @@ class TestCashAccountService(BaseUnitTestCase):
         """Set up test data."""
         super().setUp()
 
-    @patch('web.models.CashAccount.objects.raw')
+    @patch('apps.banking.models.CashAccount.objects.raw')
     def test_find_cash_accounts_by_username(self, mock_raw):
         """Test find_cash_accounts_by_username SQL injection vulnerability."""
         mock_accounts = [Mock(), Mock()]
@@ -272,7 +272,7 @@ class TestCashAccountService(BaseUnitTestCase):
         mock_raw.assert_called_once_with(expected_sql)
         self.assertEqual(result, mock_accounts)
 
-    @patch('web.models.CashAccount.objects.raw')
+    @patch('apps.banking.models.CashAccount.objects.raw')
     def test_find_cash_accounts_by_username_sql_injection(self, mock_raw):
         """Test SQL injection vulnerability in find_cash_accounts_by_username."""
         mock_accounts = [Mock()]
@@ -288,7 +288,7 @@ class TestCashAccountService(BaseUnitTestCase):
         self.assertIn("UNION SELECT", called_sql)
         self.assertIn("--", called_sql)
 
-    @patch('web.services.connection')
+    @patch('apps.banking.services.connection')
     def test_get_from_account_actual_amount(self, mock_connection):
         """Test get_from_account_actual_amount with mocked database."""
         # Setup mock cursor
@@ -305,7 +305,7 @@ class TestCashAccountService(BaseUnitTestCase):
         mock_cursor.fetchone.assert_called_once()
         self.assertEqual(result, 1500.50)
 
-    @patch('web.services.connection')
+    @patch('apps.banking.services.connection')
     def test_get_from_account_actual_amount_not_found(self, mock_connection):
         """Test get_from_account_actual_amount when account not found."""
         mock_cursor = Mock()
@@ -316,7 +316,7 @@ class TestCashAccountService(BaseUnitTestCase):
         with self.assertRaises(TypeError):
             CashAccountService.get_from_account_actual_amount('nonexistent')
 
-    @patch('web.services.connection')
+    @patch('apps.banking.services.connection')
     def test_get_id_from_number(self, mock_connection):
         """Test get_id_from_number with mocked database."""
         mock_cursor = Mock()
@@ -332,7 +332,7 @@ class TestCashAccountService(BaseUnitTestCase):
         mock_cursor.fetchone.assert_called_once()
         self.assertEqual(result, 42)
 
-    @patch('web.services.connection')
+    @patch('apps.banking.services.connection')
     def test_get_id_from_number_not_found(self, mock_connection):
         """Test get_id_from_number when account not found."""
         mock_cursor = Mock()
@@ -347,7 +347,7 @@ class TestCashAccountService(BaseUnitTestCase):
 class TestCreditAccountService(BaseUnitTestCase):
     """Unit tests for CreditAccountService."""
 
-    @patch('web.models.CreditAccount.objects.raw')
+    @patch('apps.banking.models.CreditAccount.objects.raw')
     def test_find_credit_accounts_by_username(self, mock_raw):
         """Test find_credit_accounts_by_username SQL injection vulnerability."""
         mock_accounts = [Mock(), Mock()]
@@ -360,7 +360,7 @@ class TestCreditAccountService(BaseUnitTestCase):
         mock_raw.assert_called_once_with(expected_sql)
         self.assertEqual(result, mock_accounts)
 
-    @patch('web.models.CreditAccount.objects.raw')
+    @patch('apps.banking.models.CreditAccount.objects.raw')
     def test_find_credit_accounts_sql_injection(self, mock_raw):
         """Test SQL injection vulnerability in find_credit_accounts_by_username."""
         mock_accounts = [Mock()]
@@ -376,7 +376,7 @@ class TestCreditAccountService(BaseUnitTestCase):
         self.assertIn("UPDATE web_creditaccount", called_sql)
         self.assertIn("999999", called_sql)
 
-    @patch('web.services.connection')
+    @patch('apps.banking.services.connection')
     def test_update_credit_account(self, mock_connection):
         """Test update_credit_account SQL injection vulnerability."""
         mock_cursor = Mock()
@@ -388,7 +388,7 @@ class TestCreditAccountService(BaseUnitTestCase):
         expected_sql = "UPDATE web_creditaccount SET availableBalance='2500.75' WHERE cashAccountId ='123'"
         mock_cursor.execute.assert_called_once_with(expected_sql)
 
-    @patch('web.services.connection')
+    @patch('apps.banking.services.connection')
     def test_update_credit_account_sql_injection(self, mock_connection):
         """Test SQL injection vulnerability in update_credit_account."""
         mock_cursor = Mock()
@@ -409,7 +409,7 @@ class TestCreditAccountService(BaseUnitTestCase):
 class TestActivityService(BaseUnitTestCase):
     """Unit tests for ActivityService."""
 
-    @patch('web.models.Transaction.objects.raw')
+    @patch('apps.banking.models.Transaction.objects.raw')
     def test_find_transactions_by_cash_account_number(self, mock_raw):
         """Test find_transactions_by_cash_account_number SQL injection vulnerability."""
         mock_transactions = [Mock(), Mock()]
@@ -422,7 +422,7 @@ class TestActivityService(BaseUnitTestCase):
         mock_raw.assert_called_once_with(expected_sql)
         self.assertEqual(result, mock_transactions)
 
-    @patch('web.models.Transaction.objects.raw')
+    @patch('apps.banking.models.Transaction.objects.raw')
     def test_find_transactions_sql_injection(self, mock_raw):
         """Test SQL injection vulnerability in find_transactions_by_cash_account_number."""
         mock_transactions = [Mock()]
@@ -437,7 +437,7 @@ class TestActivityService(BaseUnitTestCase):
         called_sql = mock_raw.call_args[0][0]
         self.assertIn("SELECT * FROM web_account", called_sql)
 
-    @patch('web.services.connection')
+    @patch('apps.banking.services.connection')
     def test_insert_new_activity(self, mock_connection):
         """Test insert_new_activity with parameterized query."""
         mock_cursor = Mock()
@@ -478,7 +478,7 @@ class TestTransferService(BaseUnitTestCase):
             'date': datetime.now()
         }
 
-    @patch('web.services.connection')
+    @patch('apps.banking.services.connection')
     def test_insert_transfer(self, mock_connection):
         """Test insert_transfer with parameterized query."""
         mock_cursor = Mock()
@@ -502,11 +502,11 @@ class TestTransferService(BaseUnitTestCase):
             ]
         )
 
-    @patch('web.services.TransferService.insert_transfer')
-    @patch('web.services.CashAccountService.get_from_account_actual_amount')
-    @patch('web.services.CashAccountService.get_id_from_number')
-    @patch('web.services.CreditAccountService.update_credit_account')
-    @patch('web.services.ActivityService.insert_new_activity')
+    @patch('apps.transfers.services.TransferService.insert_transfer')
+    @patch('apps.banking.services.CashAccountService.get_from_account_actual_amount')
+    @patch('apps.banking.services.CashAccountService.get_id_from_number')
+    @patch('apps.banking.services.CreditAccountService.update_credit_account')
+    @patch('apps.banking.services.ActivityService.insert_new_activity')
     def test_createNewTransfer_complete_workflow(self, mock_insert_activity,
                                                 mock_update_credit, mock_get_id,
                                                 mock_get_amount, mock_insert_transfer):
@@ -543,11 +543,11 @@ class TestTransferService(BaseUnitTestCase):
         # Verify activity records (3 activities should be created)
         self.assertEqual(mock_insert_activity.call_count, 3)
 
-    @patch('web.services.TransferService.insert_transfer')
-    @patch('web.services.CashAccountService.get_from_account_actual_amount')
-    @patch('web.services.CashAccountService.get_id_from_number')
-    @patch('web.services.CreditAccountService.update_credit_account')
-    @patch('web.services.ActivityService.insert_new_activity')
+    @patch('apps.transfers.services.TransferService.insert_transfer')
+    @patch('apps.banking.services.CashAccountService.get_from_account_actual_amount')
+    @patch('apps.banking.services.CashAccountService.get_id_from_number')
+    @patch('apps.banking.services.CreditAccountService.update_credit_account')
+    @patch('apps.banking.services.ActivityService.insert_new_activity')
     def test_createNewTransfer_description_truncation(self, mock_insert_activity,
                                                      mock_update_credit, mock_get_id,
                                                      mock_get_amount, mock_insert_transfer):
@@ -571,11 +571,11 @@ class TestTransferService(BaseUnitTestCase):
         self.assertIn('This is a ve', transfer_desc_call)  # First 12 chars
         self.assertEqual(len(transfer_desc_call.split(': ')[1]), 12)
 
-    @patch('web.services.TransferService.insert_transfer')
-    @patch('web.services.CashAccountService.get_from_account_actual_amount')
-    @patch('web.services.CashAccountService.get_id_from_number')
-    @patch('web.services.CreditAccountService.update_credit_account')
-    @patch('web.services.ActivityService.insert_new_activity')
+    @patch('apps.transfers.services.TransferService.insert_transfer')
+    @patch('apps.banking.services.CashAccountService.get_from_account_actual_amount')
+    @patch('apps.banking.services.CashAccountService.get_id_from_number')
+    @patch('apps.banking.services.CreditAccountService.update_credit_account')
+    @patch('apps.banking.services.ActivityService.insert_new_activity')
     def test_createNewTransfer_transaction_atomic(self, mock_insert_activity,
                                                  mock_update_credit, mock_get_id,
                                                  mock_get_amount, mock_insert_transfer):
@@ -759,7 +759,7 @@ class TestServiceErrorHandling(object):
     @pytest.mark.django_db
     def test_transfer_service_partial_failure(self):
         """Test TransferService handles partial transaction failures."""
-        from web.models import Transfer
+        from apps.transfers.models import Transfer
         from datetime import datetime
 
         transfer_data = {

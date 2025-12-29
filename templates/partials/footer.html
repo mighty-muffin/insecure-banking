@@ -1,0 +1,57 @@
+<footer class="page-footer">
+    <div class="footer-content">
+        <span class="footer-item">
+            Git:
+            {% if repo_url and git_commit != 'unknown' %}
+                <a href="{{ repo_url }}/commit/{{ git_commit }}" target="_blank" title="View commit on GitHub">{{ git_commit }}</a>
+            {% else %}
+                {{ git_commit }}
+            {% endif %}
+        </span>
+    </div>
+</footer>
+
+<style>
+    .page-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+        padding: 8px 15px;
+        font-size: 11px;
+        color: #6c757d;
+        z-index: 1000;
+    }
+
+    .footer-content {
+        text-align: center;
+    }
+
+    .footer-item {
+        display: inline-block;
+        margin: 0 5px;
+    }
+
+    .footer-item a {
+        color: #0d6efd;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .footer-item a:hover {
+        color: #0b5ed7;
+        text-decoration: underline;
+    }
+
+    .footer-divider {
+        color: #dee2e6;
+        margin: 0 5px;
+    }
+
+    /* Add padding to body to prevent content from being hidden behind footer */
+    body {
+        padding-bottom: 35px;
+    }
+</style>

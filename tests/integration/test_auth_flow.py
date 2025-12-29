@@ -24,7 +24,8 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from unittest.mock import patch, Mock
 
-from web.models import Account, CashAccount, CreditAccount
+from apps.accounts.models import Account
+from apps.banking.models import CashAccount, CreditAccount
 
 
 @pytest.mark.integration
@@ -66,9 +67,9 @@ class TestAuthenticationFlow(TestCase):
             availableBalance=1500.00
         )
 
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.CashAccountService.find_cash_accounts_by_username')
-    @patch('web.views.CreditAccountService.find_credit_accounts_by_username')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.banking.services.CashAccountService.find_cash_accounts_by_username')
+    @patch('apps.banking.services.CreditAccountService.find_credit_accounts_by_username')
     def test_complete_login_dashboard_logout_flow(self, mock_find_credit, mock_find_cash, mock_find_users):
         """Test complete user workflow from login to logout."""
         # Mock service responses for dashboard

@@ -27,7 +27,9 @@ import pytest
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 
-from web.models import Account, CashAccount, Transfer, Transaction
+from apps.accounts.models import Account
+from apps.banking.models import CashAccount, Transaction
+from apps.transfers.models import Transfer
 
 
 @pytest.mark.integration
@@ -81,10 +83,10 @@ class TestTransferFlow(TestCase):
             availableBalance=500.00
         )
 
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.CashAccountService.find_cash_accounts_by_username')
-    @patch('web.views.TransferService.createNewTransfer')
-    @patch('web.views.to_traces')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.banking.services.CashAccountService.find_cash_accounts_by_username')
+    @patch('apps.transfers.services.TransferService.createNewTransfer')
+    @patch('apps.banking.views.to_traces')
     def test_complete_transfer_process(self, mock_to_traces, mock_create_transfer,
                                        mock_find_cash, mock_find_users):
         """Test complete money transfer process with database verification."""
@@ -147,8 +149,8 @@ class TestTransferFlow(TestCase):
         self.assertEqual(created_transfer.amount, 100.00)
         self.assertEqual(created_transfer.username, 'user1')
 
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.CashAccountService.find_cash_accounts_by_username')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.banking.services.CashAccountService.find_cash_accounts_by_username')
     def test_insufficient_balance_handling(self, mock_find_cash, mock_find_users):
         """Test transfer with insufficient balance."""
         # Set up account with low balance
