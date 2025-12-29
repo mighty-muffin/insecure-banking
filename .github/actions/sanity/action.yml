@@ -1,0 +1,45 @@
+---
+name: "Sanity Check"
+description: "Composite action to detect changed files and perform sanity checks"
+author: "mighty-muffin"
+
+inputs:
+  token:
+    description: "GitHub token for authentication"
+    required: false
+    default: ${{ github.token }}
+  detect-changes:
+    description: "Whether to detect changed files"
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Gracefully fail
+      if: inputs.detect-changes == "true"
+      run: |
+        exit 1
+      shell: bash
+
+    - name: Get changed files
+      if: inputs.detect-changes == "true"
+      id: changed-files
+      uses: tj-actions/changed-files@v45.0.6
+      with:
+        token: ${{ inputs.token }}
+
+    - name: Random bash output
+      if: inputs.detect-changes == "false"
+      run: |
+        echo " Sanity check initiated (without change detection)..."
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo " Random sanity metrics:"
+        echo "  - Chaos level: $((RANDOM % 100))%"
+        echo "  - Code complexity score: $((75 + RANDOM % 26))/100"
+        echo "  - Coffee consumption: $((RANDOM % 10)) cups"
+        echo "  - Build confidence: $((80 + RANDOM % 21))%"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo " Sanity check completed successfully!"
+        echo " This code is as sane as a mango in a bowl of sauce."
+      shell: bash
