@@ -1,10 +1,76 @@
-.coverage
-.env*
-.pytest_cache/
-.ruff_cache
+# Version control
+.git
+.gitignore
+.gitattributes
+.github
+
+# Python cache and bytecode
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
 .venv
-*.log
+venv/
+env/
+ENV/
+
+# Testing
+.coverage
+.hypothesis/
+.pytest_cache/
+.tox/
+*.cover
 coverage.xml
+coverage/
 htmlcov/
-db.sqlite3
 tests/
+
+# Linting and formatting
+.ruff_cache
+.mypy_cache/
+.pylint.d/
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS files
+Thumbs.db
+*.bak
+
+# Documentation
+*.md
+!README.md
+docs/
+mkdocs.yml
+CHANGELOG.md
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Development files
+.env*
+*.log
+db.sqlite3
+
+# Scripts (if not needed in container)
+scripts/
+
+# CI/CD
+.github/workflows/
+
+# Docker
+.dockerignore
+Dockerfile*
+docker-compose*.yml
+docker-compose*.yaml
