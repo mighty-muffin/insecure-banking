@@ -120,11 +120,6 @@ repos:
         files: ^\.github/workflows/[^/]+\.ya?ml$
         entry: |
           "pin-github-action ."
-        args:
-          - --allow
-          - "mighty-muffin/*"
         language: node
         additional_dependencies:
           - pin-github-action@3.4.0
-        stages:
-          - manual
