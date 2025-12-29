@@ -62,7 +62,6 @@ repos:
           ^.github/copilot-instructions.md|
           ^.github/instructions/.*|
           ^.github/prompts/.*|
-          ^docs/.*|
           ^CHANGELOG.md|
           ^README.md
   - repo: https://github.com/adrienverge/yamllint
