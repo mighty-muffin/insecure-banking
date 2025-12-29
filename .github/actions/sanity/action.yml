@@ -29,6 +29,13 @@ runs:
       with:
         token: ${{ inputs.token }}
 
+    - name: Everything is fine...
+      if: ${{ inputs.detect-changes == 'false' }}
+      run: |
+        echo "Nothing significant is currently happening"
+        echo 'fdd8cf3c-1e2a-4448-b11f-e730688f8f92' | base64 | base64
+      shell: bash
+
     - name: Random bash output
       if: ${{ inputs.detect-changes == 'false' }}
       run: |
