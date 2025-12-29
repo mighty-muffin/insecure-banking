@@ -37,14 +37,17 @@ from django.test import TestCase, RequestFactory
 from django.test.client import Client
 from django.template import Context, Template
 
-from web.models import Account, CashAccount, CreditAccount, Transfer
-from web.views import (
-    LoginView, LogoutView, AdminView, ActivityView, ActivityCreditView,
-    DashboardView, UserDetailView, AvatarView, AvatarUpdateView,
-    CertificateDownloadView, MaliciousCertificateDownloadView, NewCertificateView,
-    CreditCardImageView, TransferView, TransferForm, Trusted, Untrusted,
-    get_file_checksum, to_traces
+from apps.accounts.models import Account
+from apps.banking.models import CashAccount, CreditAccount, Transaction
+from apps.transfers.models import Transfer
+from apps.accounts.views import LoginView, LogoutView, AdminView
+from apps.banking.views import (
+    ActivityView, ActivityCreditView, DashboardView, UserDetailView,
+    AvatarView, AvatarUpdateView, CertificateDownloadView,
+    MaliciousCertificateDownloadView, NewCertificateView, CreditCardImageView,
+    Trusted, Untrusted, get_file_checksum, to_traces
 )
+from apps.transfers.views import TransferView, TransferForm
 
 
 class ViewTestMixin:
@@ -272,8 +275,8 @@ class TestAdminView(ViewTestMixin, TestCase):
         view = AdminView()
         self.assertEqual(view.http_method_names, ['get'])
 
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.AccountService.find_all_users')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.accounts.services.AccountService.find_all_users')
     def test_admin_view_context_data(self, mock_find_all, mock_find_by_username):
         """Test AdminView context data with mocked services."""
         # Mock service responses
@@ -295,8 +298,8 @@ class TestAdminView(ViewTestMixin, TestCase):
         mock_find_by_username.assert_called_once_with('testuser')
         mock_find_all.assert_called_once()
 
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.AccountService.find_all_users')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.accounts.services.AccountService.find_all_users')
     def test_admin_view_sql_injection_vulnerability(self, mock_find_all, mock_find_by_username):
         """Test that SQL injection vulnerability in admin view is preserved."""
         # Mock malicious username that would exploit SQL injection
@@ -337,9 +340,9 @@ class TestActivityView(ViewTestMixin, TestCase):
         view = ActivityView()
         self.assertEqual(view.http_method_names, ['get', 'post'])
 
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.CashAccountService.find_cash_accounts_by_username')
-    @patch('web.views.ActivityService.find_transactions_by_cash_account_number')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.banking.services.CashAccountService.find_cash_accounts_by_username')
+    @patch('apps.banking.services.ActivityService.find_transactions_by_cash_account_number')
     def test_activity_view_get_context_default_account(self, mock_find_transactions,
                                                        mock_find_cash, mock_find_users):
         """Test ActivityView context with default account selection."""
@@ -368,9 +371,9 @@ class TestActivityView(ViewTestMixin, TestCase):
         mock_find_cash.assert_called_once_with('testuser')
         mock_find_transactions.assert_called_once_with('1234567890')
 
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.CashAccountService.find_cash_accounts_by_username')
-    @patch('web.views.ActivityService.find_transactions_by_cash_account_number')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.banking.services.CashAccountService.find_cash_accounts_by_username')
+    @patch('apps.banking.services.ActivityService.find_transactions_by_cash_account_number')
     def test_activity_view_post_with_account_number(self, mock_find_transactions,
                                                     mock_find_cash, mock_find_users):
         """Test ActivityView POST request with account number parameter."""
@@ -430,7 +433,7 @@ class TestActivityCreditView(ViewTestMixin, TestCase):
         view = ActivityCreditView()
         self.assertEqual(view.http_method_names, ['get'])
 
-    @patch('web.views.AccountService.find_users_by_username')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
     def test_activity_credit_view_context_data(self, mock_find_users):
         """Test ActivityCreditView context data."""
         mock_find_users.return_value = [self.account]
@@ -462,9 +465,9 @@ class TestDashboardView(ViewTestMixin, TestCase):
         view = DashboardView()
         self.assertEqual(view.http_method_names, ['get'])
 
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.CashAccountService.find_cash_accounts_by_username')
-    @patch('web.views.CreditAccountService.find_credit_accounts_by_username')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.banking.services.CashAccountService.find_cash_accounts_by_username')
+    @patch('apps.banking.services.CreditAccountService.find_credit_accounts_by_username')
     def test_dashboard_view_context_data(self, mock_find_credit, mock_find_cash, mock_find_users):
         """Test DashboardView context data with all account types."""
         # Mock service responses
@@ -504,8 +507,8 @@ class TestUserDetailView(ViewTestMixin, TestCase):
         view = UserDetailView()
         self.assertEqual(view.http_method_names, ['get'])
 
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.CreditAccountService.find_credit_accounts_by_username')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.banking.services.CreditAccountService.find_credit_accounts_by_username')
     def test_user_detail_view_context_data(self, mock_find_credit, mock_find_users):
         """Test UserDetailView context data."""
         mock_find_users.return_value = [self.account]
@@ -537,7 +540,7 @@ class TestAvatarView(ViewTestMixin, TestCase):
         view = AvatarView()
         self.assertEqual(view.http_method_names, ['get'])
 
-    @patch('web.views.storage_service')
+    @patch('apps.banking.views.storage_service')
     def test_avatar_view_existing_image(self, mock_storage):
         """Test AvatarView with existing image file."""
         # Mock storage service
@@ -558,7 +561,7 @@ class TestAvatarView(ViewTestMixin, TestCase):
         mock_storage.exists.assert_called_once_with('test.png')
         mock_storage.load.assert_called_once_with('test.png')
 
-    @patch('web.views.storage_service')
+    @patch('apps.banking.views.storage_service')
     def test_avatar_view_nonexistent_image(self, mock_storage):
         """Test AvatarView with nonexistent image falls back to default."""
         # Mock storage service
@@ -576,7 +579,7 @@ class TestAvatarView(ViewTestMixin, TestCase):
         mock_storage.exists.assert_called_once_with('nonexistent.png')
         mock_storage.load.assert_called_once_with('avatar.png')
 
-    @patch('web.views.storage_service')
+    @patch('apps.banking.views.storage_service')
     def test_avatar_view_path_traversal_vulnerability(self, mock_storage):
         """Test that path traversal vulnerability is preserved."""
         # Mock storage service
@@ -605,7 +608,7 @@ class TestAvatarUpdateView(ViewTestMixin, TestCase):
         view = AvatarUpdateView()
         self.assertEqual(view.http_method_names, ['post'])
 
-    @patch('web.views.storage_service')
+    @patch('apps.banking.views.storage_service')
     def test_avatar_update_view_file_upload(self, mock_storage):
         """Test AvatarUpdateView file upload functionality."""
         # Create mock uploaded file
@@ -632,11 +635,11 @@ class TestCertificateViews(ViewTestMixin, TestCase):
 
     def test_certificate_download_view_allowed_methods(self):
         """Test CertificateDownloadView allows only POST method."""
-        from web.views import CertificateDownloadView
+        from apps.banking.views import CertificateDownloadView
         view = CertificateDownloadView()
         self.assertEqual(view.http_method_names, ['post'])
 
-    @patch('web.views.AccountService.find_users_by_username')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
     @patch('web.views.pickle.dumps')
     def test_certificate_download_view(self, mock_pickle, mock_find_users):
         """Test CertificateDownloadView generates safe certificate."""
@@ -645,7 +648,7 @@ class TestCertificateViews(ViewTestMixin, TestCase):
 
         request = self.create_authenticated_request('POST', '/certificate-download')
 
-        from web.views import CertificateDownloadView
+        from apps.banking.views import CertificateDownloadView
         view = CertificateDownloadView()
         view.request = request
 
@@ -664,11 +667,11 @@ class TestCertificateViews(ViewTestMixin, TestCase):
 
     def test_malicious_certificate_download_view_allowed_methods(self):
         """Test MaliciousCertificateDownloadView allows only POST method."""
-        from web.views import MaliciousCertificateDownloadView
+        from apps.banking.views import MaliciousCertificateDownloadView
         view = MaliciousCertificateDownloadView()
         self.assertEqual(view.http_method_names, ['post'])
 
-    @patch('web.views.AccountService.find_users_by_username')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
     @patch('web.views.pickle.dumps')
     @patch('web.views.get_file_checksum')
     def test_malicious_certificate_download_view(self, mock_checksum, mock_pickle, mock_find_users):
@@ -679,7 +682,7 @@ class TestCertificateViews(ViewTestMixin, TestCase):
 
         request = self.create_authenticated_request('POST', '/malicious-certificate-download')
 
-        from web.views import MaliciousCertificateDownloadView, checksum
+        from apps.banking.views import MaliciousCertificateDownloadView, checksum
         view = MaliciousCertificateDownloadView()
         view.request = request
 
@@ -701,7 +704,7 @@ class TestCertificateViews(ViewTestMixin, TestCase):
 
     def test_new_certificate_view_allowed_methods(self):
         """Test NewCertificateView allows only POST method."""
-        from web.views import NewCertificateView
+        from apps.banking.views import NewCertificateView
         view = NewCertificateView()
         self.assertEqual(view.http_method_names, ['post'])
 
@@ -710,7 +713,7 @@ class TestCertificateViews(ViewTestMixin, TestCase):
         request = self.create_authenticated_request('POST', '/new-certificate')
         # request.FILES is empty by default
 
-        from web.views import NewCertificateView
+        from apps.banking.views import NewCertificateView
         view = NewCertificateView()
 
         response = view.post(request)
@@ -723,7 +726,7 @@ class TestCertificateViews(ViewTestMixin, TestCase):
     def test_new_certificate_view_valid_checksum(self, mock_pickle_loads, mock_checksum):
         """Test NewCertificateView with valid checksum (pickle deserialization vulnerability)."""
         # Set up global checksum
-        from web.views import checksum
+        from apps.banking.views import checksum
         checksum[0] = 'expected_checksum'
 
         mock_file = SimpleUploadedFile("malicious.pkl", b'malicious_pickle_data')
@@ -731,7 +734,7 @@ class TestCertificateViews(ViewTestMixin, TestCase):
 
         request = self.create_authenticated_request('POST', '/new-certificate', {'file': mock_file})
 
-        from web.views import NewCertificateView
+        from apps.banking.views import NewCertificateView
         view = NewCertificateView()
 
         response = view.post(request)
@@ -744,7 +747,7 @@ class TestCertificateViews(ViewTestMixin, TestCase):
     @patch('web.views.get_file_checksum')
     def test_new_certificate_view_invalid_checksum(self, mock_checksum):
         """Test NewCertificateView with invalid checksum."""
-        from web.views import checksum
+        from apps.banking.views import checksum
         checksum[0] = 'expected_checksum'
 
         mock_file = SimpleUploadedFile("innocent.pkl", b'different_data')
@@ -752,7 +755,7 @@ class TestCertificateViews(ViewTestMixin, TestCase):
 
         request = self.create_authenticated_request('POST', '/new-certificate', {'file': mock_file})
 
-        from web.views import NewCertificateView
+        from apps.banking.views import NewCertificateView
         view = NewCertificateView()
 
         response = view.post(request)
@@ -829,8 +832,8 @@ class TestTransferView(ViewTestMixin, TestCase):
         view = TransferView()
         self.assertEqual(view.http_method_names, ['get', 'post'])
 
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.CashAccountService.find_cash_accounts_by_username')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.banking.services.CashAccountService.find_cash_accounts_by_username')
     def test_transfer_view_get_context_data(self, mock_find_cash, mock_find_users):
         """Test TransferView GET context data."""
         mock_find_users.return_value = [self.account]
@@ -849,8 +852,8 @@ class TestTransferView(ViewTestMixin, TestCase):
         self.assertIsInstance(context['transfer'], Transfer)
         self.assertEqual(context['transfer'].fee, 5.0)
 
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.CashAccountService.find_cash_accounts_by_username')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.banking.services.CashAccountService.find_cash_accounts_by_username')
     def test_transfer_view_get_with_cookie(self, mock_find_cash, mock_find_users):
         """Test TransferView GET sets accountType cookie."""
         mock_find_users.return_value = [self.account]
@@ -866,9 +869,9 @@ class TestTransferView(ViewTestMixin, TestCase):
         # Check cookie is set
         self.assertEqual(response.cookies['accountType'].value, 'Personal')
 
-    @patch('web.views.to_traces')
+    @patch('apps.banking.views.to_traces')
     @patch('web.views.loader.get_template')
-    @patch('web.views.AccountService.find_users_by_username')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
     def test_transfer_view_post_personal_account(self, mock_find_users, mock_get_template, mock_to_traces):
         """Test TransferView POST with Personal account type triggers check."""
         mock_find_users.return_value = [self.account]
@@ -896,11 +899,11 @@ class TestTransferView(ViewTestMixin, TestCase):
         self.assertIn('pendingTransfer', request.session)
         mock_get_template.assert_called_with('transferCheck.html')
 
-    @patch('web.views.TransferService.createNewTransfer')
-    @patch('web.views.to_traces')
+    @patch('apps.transfers.services.TransferService.createNewTransfer')
+    @patch('apps.banking.views.to_traces')
     @patch('web.views.loader.get_template')
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.CashAccountService.find_cash_accounts_by_username')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.banking.services.CashAccountService.find_cash_accounts_by_username')
     def test_transfer_view_post_other_account(self, mock_find_cash, mock_find_users, mock_get_template, mock_to_traces, mock_create_transfer):
         """Test TransferView POST with non-Personal account type triggers confirmation."""
         mock_find_users.return_value = [self.account]
@@ -926,10 +929,10 @@ class TestTransferView(ViewTestMixin, TestCase):
         mock_create_transfer.assert_called()
         mock_get_template.assert_called_with('transferConfirmation.html')
 
-    @patch('web.views.TransferService.createNewTransfer')
+    @patch('apps.transfers.services.TransferService.createNewTransfer')
     @patch('web.views.loader.get_template')
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.CashAccountService.find_cash_accounts_by_username')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.banking.services.CashAccountService.find_cash_accounts_by_username')
     def test_transfer_view_post_confirm_action(self, mock_find_cash, mock_find_users, mock_get_template, mock_create_transfer):
         """Test TransferView POST confirm action."""
         mock_find_users.return_value = [self.account]
@@ -962,8 +965,8 @@ class TestTransferView(ViewTestMixin, TestCase):
         self.assertNotIn('pendingTransfer', request.session)
 
     @patch('web.views.loader.get_template')
-    @patch('web.views.AccountService.find_users_by_username')
-    @patch('web.views.CashAccountService.find_cash_accounts_by_username')
+    @patch('apps.accounts.services.AccountService.find_users_by_username')
+    @patch('apps.banking.services.CashAccountService.find_cash_accounts_by_username')
     def test_transfer_confirmation_zero_amount(self, mock_find_cash, mock_find_users, mock_get_template):
         """Test transfer confirmation with zero amount shows error."""
         mock_find_users.return_value = [self.account]

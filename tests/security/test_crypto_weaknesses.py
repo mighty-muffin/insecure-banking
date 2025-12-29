@@ -24,7 +24,7 @@ import pytest
 from unittest.mock import patch, Mock
 from django.test import TestCase
 
-from web.views import get_file_checksum, secretKey
+from apps.banking.views import get_file_checksum, secretKey
 
 
 @pytest.mark.security

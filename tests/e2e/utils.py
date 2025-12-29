@@ -1,5 +1,5 @@
 from playwright.sync_api import Page, expect
-from web.models import Account
+from apps.accounts.models import Account
 
 def login_user(page: Page, live_server_url: str, username: str = "testuser", password: str = "password123"):
     # Ensure user exists (this might fail if called multiple times with same user, so we handle it)

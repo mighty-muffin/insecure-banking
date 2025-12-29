@@ -80,7 +80,7 @@ def enable_db_access_for_all_tests(db):
 @pytest.fixture
 def sample_account(db):
     """Create a sample Account model instance."""
-    from web.models import Account
+    from apps.accounts.models import Account
 
     account = Account.objects.create(
         username="testuser",
@@ -95,7 +95,7 @@ def sample_account(db):
 @pytest.fixture
 def sample_cash_account(db, sample_account):
     """Create a sample CashAccount model instance."""
-    from web.models import CashAccount
+    from apps.banking.models import CashAccount
 
     cash_account = CashAccount.objects.create(
         number="1234567890",
@@ -110,7 +110,7 @@ def sample_cash_account(db, sample_account):
 @pytest.fixture
 def sample_credit_account(db, sample_cash_account):
     """Create a sample CreditAccount model instance."""
-    from web.models import CreditAccount
+    from apps.banking.models import CreditAccount
 
     credit_account = CreditAccount.objects.create(
         cashAccountId=1,
@@ -126,7 +126,7 @@ def sample_credit_account(db, sample_cash_account):
 @pytest.fixture
 def sample_transfer(db, sample_account):
     """Create a sample Transfer model instance."""
-    from web.models import Transfer
+    from apps.transfers.models import Transfer
     from datetime import datetime
 
     transfer = Transfer.objects.create(
@@ -145,7 +145,7 @@ def sample_transfer(db, sample_account):
 @pytest.fixture
 def sample_transaction(db):
     """Create a sample Transaction model instance."""
-    from web.models import Transaction
+    from apps.banking.models import Transaction
     from datetime import datetime
 
     transaction = Transaction.objects.create(
@@ -162,7 +162,7 @@ def sample_transaction(db):
 @pytest.fixture
 def authenticated_user(db):
     """Create an authenticated user for testing."""
-    from web.models import Account
+    from apps.accounts.models import Account
 
     account = Account.objects.create(
         username="authuser",
@@ -189,7 +189,7 @@ def authenticated_client(client, authenticated_user):
 @pytest.fixture
 def db_with_data(db):
     """Database with sample test data using real models."""
-    from web.models import Account, CashAccount, CreditAccount, Transfer, Transaction
+    from apps.accounts.models import Account, CashAccount, CreditAccount, Transfer, Transaction
     from datetime import datetime
 
     # Create test account
@@ -250,7 +250,7 @@ def db_with_data(db):
 def account_factory():
     """Factory for creating Account instances."""
     def _create_account(**kwargs):
-        from web.models import Account
+        from apps.accounts.models import Account
         defaults = {
             'username': f"user_{generate_random_string(8)}",
             'name': "Test",
@@ -266,7 +266,7 @@ def account_factory():
 def cash_account_factory():
     """Factory for creating CashAccount instances."""
     def _create_cash_account(**kwargs):
-        from web.models import CashAccount
+        from apps.banking.models import CashAccount
         defaults = {
             'number': generate_account_number(),
             'username': f"user_{generate_random_string(8)}",
@@ -282,7 +282,7 @@ def cash_account_factory():
 def credit_account_factory():
     """Factory for creating CreditAccount instances."""
     def _create_credit_account(**kwargs):
-        from web.models import CreditAccount
+        from apps.banking.models import CreditAccount
         defaults = {
             'cashAccountId': 1,
             'number': generate_account_number(),
@@ -299,7 +299,7 @@ def credit_account_factory():
 def transfer_factory():
     """Factory for creating Transfer instances."""
     def _create_transfer(**kwargs):
-        from web.models import Transfer
+        from apps.transfers.models import Transfer
         from datetime import datetime
         defaults = {
             'fromAccount': generate_account_number(),
@@ -319,7 +319,7 @@ def transfer_factory():
 def transaction_factory():
     """Factory for creating Transaction instances."""
     def _create_transaction(**kwargs):
-        from web.models import Transaction
+        from apps.banking.models import Transaction
         from datetime import datetime
         defaults = {
             'number': f"TXN{generate_random_string(6)}",

@@ -1,0 +1,1215 @@
+/*
+ * Dark Mode Theme - Dark Blue Shades
+ * Comprehensive dark theme for the entire application
+ */
+
+/* ========================================================================
+ * Base Styles - Dark Blue Color Palette
+ * ======================================================================== */
+:root {
+  /* Primary Dark Blues */
+  --bg-darkest: #0a0e1a;
+  --bg-darker: #0f1419;
+  --bg-dark: #1a1f2e;
+  --bg-medium: #1e2538;
+  --bg-light: #252d42;
+  --bg-lighter: #2d3651;
+
+  /* Accent Blues */
+  --accent-primary: #2563eb;
+  --accent-secondary: #3b82f6;
+  --accent-light: #60a5fa;
+  --accent-hover: #1d4ed8;
+
+  /* Text Colors */
+  --text-primary: #e8eaed;
+  --text-secondary: #b8bcc8;
+  --text-muted: #7e8593;
+  --text-disabled: #4e5566;
+
+  /* Border Colors */
+  --border-dark: #2d3651;
+  --border-medium: #3d4663;
+  --border-light: #4e5773;
+
+  /* Status Colors - Dark Mode Variants */
+  --success-dark: #059669;
+  --warning-dark: #d97706;
+  --danger-dark: #dc2626;
+  --info-dark: #0ea5e9;
+}
+
+/* ========================================================================
+ * Global Base Styles
+ * ======================================================================== */
+body {
+  background: var(--bg-darkest) !important;
+  color: var(--text-primary) !important;
+  font-family: "Open Sans", sans-serif;
+}
+
+html {
+  background: var(--bg-darkest) !important;
+}
+
+/* Links */
+a {
+  color: var(--accent-light) !important;
+}
+
+a:hover,
+a:focus {
+  color: var(--accent-secondary) !important;
+}
+
+/* Horizontal Rules */
+hr {
+  border-color: var(--border-medium) !important;
+}
+
+/* ========================================================================
+ * Layout Components
+ * ======================================================================== */
+
+/* Main Content Area */
+.main-content,
+.primary-content-wrapper,
+.content-wrapper {
+  background: var(--bg-darkest) !important;
+  color: var(--text-primary) !important;
+}
+
+.col-left,
+.col-right {
+  background: var(--bg-darkest) !important;
+}
+
+.col-left {
+  background: var(--bg-dark) !important;
+}
+
+/* Right Content */
+.right-content {
+  background: var(--bg-darkest) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Primary Content */
+.primary-content {
+  background: var(--bg-darkest) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Wrapper */
+.wrapper {
+  background: var(--bg-darkest) !important;
+}
+
+/* Container */
+.container {
+  background: transparent !important;
+}
+
+/* Middle Content */
+.middle-content {
+  background: var(--bg-darkest) !important;
+}
+
+/* ========================================================================
+ * Sidebar
+ * ======================================================================== */
+.sidebar-wrapper {
+  background: var(--bg-dark) !important;
+  border-right: 1px solid var(--border-dark) !important;
+}
+
+.right-sidebar {
+  background-color: var(--bg-dark) !important;
+}
+
+.right-sidebar .widget-chat-contacts {
+  background: transparent !important;
+}
+
+.right-sidebar .widget-chat-contacts .widget-header {
+  background-color: var(--bg-dark) !important;
+}
+
+/* Sidebar Navigation */
+.sidebar-nav,
+.sidebar-nav ul,
+.sidebar-nav li {
+  background: var(--bg-dark) !important;
+}
+
+.sidebar-nav a {
+  color: var(--text-secondary) !important;
+  border-bottom: 1px solid var(--border-dark) !important;
+}
+
+.sidebar-nav a:hover {
+  background: var(--bg-medium) !important;
+  color: var(--accent-light) !important;
+}
+
+.sidebar-nav .active a {
+  background: var(--bg-medium) !important;
+  color: var(--accent-secondary) !important;
+  border-left: 3px solid var(--accent-primary) !important;
+}
+
+/* Main Navigation */
+.main-nav {
+  background: var(--bg-dark) !important;
+}
+
+.main-nav h3 {
+  color: var(--text-muted) !important;
+  background: var(--bg-medium) !important;
+  padding: 10px 15px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 1px !important;
+}
+
+.main-menu {
+  background: var(--bg-dark) !important;
+}
+
+.main-menu li {
+  border-bottom: 1px solid var(--border-dark) !important;
+}
+
+.main-menu li a {
+  color: var(--text-secondary) !important;
+  background: var(--bg-dark) !important;
+  padding: 12px 15px !important;
+  display: block !important;
+}
+
+.main-menu li a:hover {
+  background: var(--bg-medium) !important;
+  color: var(--accent-light) !important;
+  text-decoration: none !important;
+}
+
+.main-menu li.active > a {
+  background: var(--bg-medium) !important;
+  color: var(--accent-secondary) !important;
+  border-left: 3px solid var(--accent-primary) !important;
+}
+
+.main-menu li a i {
+  color: var(--text-muted) !important;
+  margin-right: 10px !important;
+}
+
+.main-menu li.active > a i {
+  color: var(--accent-primary) !important;
+}
+
+/* Submenu */
+.sub-menu {
+  background: var(--bg-light) !important;
+}
+
+.sub-menu li {
+  border-bottom: 1px solid var(--border-dark) !important;
+}
+
+.sub-menu li a {
+  color: var(--text-secondary) !important;
+  background: var(--bg-light) !important;
+  padding-left: 50px !important;
+}
+
+.sub-menu li a:hover {
+  background: var(--bg-medium) !important;
+  color: var(--accent-light) !important;
+}
+
+/* Left Content */
+.left-content {
+  background: var(--bg-dark) !important;
+}
+
+.left-content-bg {
+  background: var(--bg-dark) !important;
+}
+
+/* ========================================================================
+ * Navigation & Header
+ * ======================================================================== */
+.navbar,
+.navbar-default {
+  background: var(--bg-dark) !important;
+  border-color: var(--border-dark) !important;
+}
+
+.navbar-brand {
+  color: var(--text-primary) !important;
+}
+
+.navbar-nav > li > a {
+  color: var(--text-secondary) !important;
+}
+
+.navbar-nav > li > a:hover,
+.navbar-nav > li > a:focus {
+  color: var(--accent-light) !important;
+  background: var(--bg-medium) !important;
+}
+
+.navbar-nav > .active > a,
+.navbar-nav > .open > a {
+  background: var(--bg-medium) !important;
+  color: var(--accent-secondary) !important;
+}
+
+/* Top Bar / Header */
+.top-bar,
+.header-top,
+.page-header {
+  background: var(--bg-dark) !important;
+  border-bottom: 1px solid var(--border-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Logo */
+.logo {
+  color: var(--text-primary) !important;
+}
+
+.logo-text {
+  color: var(--text-primary) !important;
+}
+
+.fa-logo {
+  color: var(--accent-primary) !important;
+}
+
+/* Logged User Menu */
+.logged-user .btn-link {
+  color: var(--text-secondary) !important;
+}
+
+.logged-user .btn-link:hover {
+  color: var(--accent-light) !important;
+}
+
+.logged-user .name {
+  color: var(--text-primary) !important;
+}
+
+/* Off-canvas button */
+.btn-off-canvas {
+  color: var(--text-secondary) !important;
+}
+
+.btn-off-canvas:hover {
+  color: var(--accent-light) !important;
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+  background-color: transparent !important;
+}
+
+.breadcrumb a {
+  color: var(--text-secondary) !important;
+}
+
+.breadcrumb > .active {
+  color: var(--text-muted) !important;
+}
+
+/* Heading */
+.heading h2,
+.heading h3,
+.heading h4 {
+  color: var(--text-primary) !important;
+}
+
+/* ========================================================================
+ * Panels & Cards
+ * ======================================================================== */
+.panel {
+  background: var(--bg-dark) !important;
+  border: 1px solid var(--border-dark) !important;
+}
+
+.panel-heading,
+.panel-header {
+  background: var(--bg-medium) !important;
+  border-bottom: 1px solid var(--border-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+.panel-title {
+  color: var(--text-primary) !important;
+}
+
+.panel-body,
+.panel-content {
+  background: var(--bg-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+.panel-footer {
+  background: var(--bg-medium) !important;
+  border-top: 1px solid var(--border-dark) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Panel Variants */
+.panel-default {
+  border-color: var(--border-dark) !important;
+}
+
+.panel-default > .panel-heading {
+  background: var(--bg-medium) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-dark) !important;
+}
+
+.panel-primary {
+  border-color: var(--accent-primary) !important;
+}
+
+.panel-primary > .panel-heading {
+  background: var(--accent-primary) !important;
+  color: white !important;
+}
+
+/* ========================================================================
+ * Tables
+ * ======================================================================== */
+.table {
+  color: var(--text-primary) !important;
+  background: var(--bg-dark) !important;
+}
+
+.table thead th,
+.table thead td {
+  background: var(--bg-medium) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 2px solid var(--border-medium) !important;
+}
+
+.table th {
+  color: var(--text-primary) !important;
+}
+
+.table tbody tr {
+  background: var(--bg-dark) !important;
+  border-bottom: 1px solid var(--border-dark) !important;
+}
+
+.table tbody tr:hover {
+  background: var(--bg-medium) !important;
+}
+
+.table tbody td,
+.table tbody th {
+  color: var(--text-primary) !important;
+  border-color: var(--border-dark) !important;
+}
+
+/* Table Striped */
+.table-striped > tbody > tr:nth-child(odd) > td,
+.table-striped > tbody > tr:nth-child(odd) > th {
+  background: var(--bg-light) !important;
+}
+
+.table-striped > tbody > tr:nth-child(even) > td,
+.table-striped > tbody > tr:nth-child(even) > th {
+  background: var(--bg-dark) !important;
+}
+
+/* Table Hover */
+.table-hover > tbody > tr:hover > td,
+.table-hover > tbody > tr:hover > th {
+  background: var(--bg-medium) !important;
+}
+
+/* Table Bordered */
+.table-bordered,
+.table-bordered > thead > tr > th,
+.table-bordered > tbody > tr > td {
+  border-color: var(--border-dark) !important;
+}
+
+.table-bordered thead th {
+  background: var(--bg-medium) !important;
+  color: var(--text-primary) !important;
+}
+
+table.table-bordered thead > tr > th {
+  background: var(--bg-medium) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Colored Header Tables */
+.colored-header thead th {
+  background: var(--bg-medium) !important;
+  color: var(--text-primary) !important;
+}
+
+table.colored-header thead > tr > th {
+  background: var(--bg-medium) !important;
+  background-color: var(--bg-medium) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Active Row */
+.table tbody tr.active td,
+.table tbody tr.active th {
+  background: var(--bg-medium) !important;
+  color: var(--accent-light) !important;
+}
+
+/* ========================================================================
+ * Forms & Inputs
+ * ======================================================================== */
+.form-control {
+  background: var(--bg-light) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-medium) !important;
+}
+
+.form-control:focus {
+  background: var(--bg-lighter) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
+}
+
+.form-control::placeholder {
+  color: var(--text-disabled) !important;
+}
+
+.form-control[disabled],
+.form-control[readonly] {
+  background: var(--bg-medium) !important;
+  color: var(--text-muted) !important;
+}
+
+/* Input Groups */
+.input-group-addon {
+  background: var(--bg-medium) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-medium) !important;
+}
+
+/* Labels */
+.control-label,
+label {
+  color: var(--text-secondary) !important;
+}
+
+/* Select Dropdowns */
+select.form-control {
+  background: var(--bg-light) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-medium) !important;
+}
+
+select.form-control option {
+  background: var(--bg-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Textarea */
+textarea.form-control {
+  background: var(--bg-light) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ========================================================================
+ * Buttons
+ * ======================================================================== */
+.btn {
+  border: 1px solid var(--border-medium) !important;
+}
+
+.btn-default {
+  background: var(--bg-medium) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-medium) !important;
+}
+
+.btn-default:hover,
+.btn-default:focus {
+  background: var(--bg-light) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-light) !important;
+}
+
+.btn-primary {
+  background: var(--accent-primary) !important;
+  color: white !important;
+  border-color: var(--accent-primary) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: var(--accent-hover) !important;
+  border-color: var(--accent-hover) !important;
+}
+
+.btn-success {
+  background: var(--success-dark) !important;
+  color: white !important;
+  border-color: var(--success-dark) !important;
+}
+
+.btn-info {
+  background: var(--info-dark) !important;
+  color: white !important;
+  border-color: var(--info-dark) !important;
+}
+
+.btn-warning {
+  background: var(--warning-dark) !important;
+  color: white !important;
+  border-color: var(--warning-dark) !important;
+}
+
+.btn-danger {
+  background: var(--danger-dark) !important;
+  color: white !important;
+  border-color: var(--danger-dark) !important;
+}
+
+/* ========================================================================
+ * Dropdowns
+ * ======================================================================== */
+.dropdown-menu {
+  background: var(--bg-dark) !important;
+  border: 1px solid var(--border-medium) !important;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dropdown-menu > li > a {
+  color: var(--text-secondary) !important;
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+  background: var(--bg-medium) !important;
+  color: var(--accent-light) !important;
+}
+
+.dropdown-menu > .active > a {
+  background: var(--accent-primary) !important;
+  color: white !important;
+}
+
+.dropdown-menu .divider {
+  background-color: var(--border-dark) !important;
+}
+
+.dropdown-header {
+  color: var(--text-muted) !important;
+}
+
+/* ========================================================================
+ * Modals
+ * ======================================================================== */
+.modal-content {
+  background: var(--bg-dark) !important;
+  border: 1px solid var(--border-medium) !important;
+}
+
+.modal-header {
+  background: var(--bg-medium) !important;
+  border-bottom: 1px solid var(--border-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+.modal-title {
+  color: var(--text-primary) !important;
+}
+
+.modal-body {
+  background: var(--bg-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+.modal-footer {
+  background: var(--bg-medium) !important;
+  border-top: 1px solid var(--border-dark) !important;
+}
+
+.close {
+  color: var(--text-secondary) !important;
+  opacity: 0.8 !important;
+}
+
+.close:hover {
+  color: var(--text-primary) !important;
+  opacity: 1 !important;
+}
+
+/* ========================================================================
+ * Alerts
+ * ======================================================================== */
+.alert {
+  border: 1px solid var(--border-medium) !important;
+}
+
+.alert-success {
+  background: rgba(5, 150, 105, 0.2) !important;
+  color: #6ee7b7 !important;
+  border-color: var(--success-dark) !important;
+}
+
+.alert-info {
+  background: rgba(14, 165, 233, 0.2) !important;
+  color: #7dd3fc !important;
+  border-color: var(--info-dark) !important;
+}
+
+.alert-warning {
+  background: rgba(217, 119, 6, 0.2) !important;
+  color: #fbbf24 !important;
+  border-color: var(--warning-dark) !important;
+}
+
+.alert-danger {
+  background: rgba(220, 38, 38, 0.2) !important;
+  color: #fca5a5 !important;
+  border-color: var(--danger-dark) !important;
+}
+
+/* ========================================================================
+ * Wells
+ * ======================================================================== */
+.well {
+  background: var(--bg-medium) !important;
+  border: 1px solid var(--border-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ========================================================================
+ * List Groups
+ * ======================================================================== */
+.list-group {
+  background: var(--bg-dark) !important;
+}
+
+.list-group-item {
+  background: var(--bg-dark) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-dark) !important;
+}
+
+.list-group-item:hover {
+  background: var(--bg-medium) !important;
+}
+
+.list-group-item.active {
+  background: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  color: white !important;
+}
+
+/* ========================================================================
+ * Badges & Labels
+ * ======================================================================== */
+.badge {
+  background: var(--bg-medium) !important;
+  color: var(--text-primary) !important;
+}
+
+.label {
+  color: white !important;
+}
+
+.label-default {
+  background: var(--bg-lighter) !important;
+}
+
+.label-primary {
+  background: var(--accent-primary) !important;
+}
+
+.label-success {
+  background: var(--success-dark) !important;
+}
+
+.label-info {
+  background: var(--info-dark) !important;
+}
+
+.label-warning {
+  background: var(--warning-dark) !important;
+}
+
+.label-danger {
+  background: var(--danger-dark) !important;
+}
+
+/* ========================================================================
+ * Progress Bars
+ * ======================================================================== */
+.progress {
+  background: var(--bg-medium) !important;
+  border: 1px solid var(--border-dark) !important;
+}
+
+.progress-bar {
+  background: var(--accent-primary) !important;
+}
+
+.progress-bar-success {
+  background: var(--success-dark) !important;
+}
+
+.progress-bar-info {
+  background: var(--info-dark) !important;
+}
+
+.progress-bar-warning {
+  background: var(--warning-dark) !important;
+}
+
+.progress-bar-danger {
+  background: var(--danger-dark) !important;
+}
+
+/* ========================================================================
+ * Pagination
+ * ======================================================================== */
+.pagination > li > a,
+.pagination > li > span {
+  background: var(--bg-dark) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-dark) !important;
+}
+
+.pagination > li > a:hover,
+.pagination > li > span:hover {
+  background: var(--bg-medium) !important;
+  color: var(--accent-light) !important;
+}
+
+.pagination > .active > a,
+.pagination > .active > span {
+  background: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  color: white !important;
+}
+
+.pagination > .disabled > a,
+.pagination > .disabled > span {
+  background: var(--bg-dark) !important;
+  color: var(--text-disabled) !important;
+}
+
+/* ========================================================================
+ * Tabs & Pills
+ * ======================================================================== */
+.nav-tabs {
+  border-bottom: 1px solid var(--border-dark) !important;
+}
+
+.nav-tabs > li > a {
+  color: var(--text-secondary) !important;
+  background: var(--bg-medium) !important;
+  border: 1px solid var(--border-dark) !important;
+}
+
+.nav-tabs > li > a:hover {
+  background: var(--bg-light) !important;
+  border-color: var(--border-medium) !important;
+  color: var(--accent-light) !important;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+  background: var(--bg-dark) !important;
+  color: var(--accent-secondary) !important;
+  border: 1px solid var(--border-dark) !important;
+  border-bottom-color: transparent !important;
+}
+
+.nav-pills > li > a {
+  color: var(--text-secondary) !important;
+}
+
+.nav-pills > li > a:hover {
+  background: var(--bg-medium) !important;
+  color: var(--accent-light) !important;
+}
+
+.nav-pills > li.active > a,
+.nav-pills > li.active > a:hover,
+.nav-pills > li.active > a:focus {
+  background: var(--accent-primary) !important;
+  color: white !important;
+}
+
+.tab-content {
+  background: var(--bg-dark) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-dark) !important;
+  border-top: none !important;
+}
+
+/* ========================================================================
+ * Tooltips & Popovers
+ * ======================================================================== */
+.tooltip-inner {
+  background: var(--bg-lighter) !important;
+  color: var(--text-primary) !important;
+}
+
+.tooltip.top .tooltip-arrow {
+  border-top-color: var(--bg-lighter) !important;
+}
+
+.tooltip.right .tooltip-arrow {
+  border-right-color: var(--bg-lighter) !important;
+}
+
+.tooltip.bottom .tooltip-arrow {
+  border-bottom-color: var(--bg-lighter) !important;
+}
+
+.tooltip.left .tooltip-arrow {
+  border-left-color: var(--bg-lighter) !important;
+}
+
+.popover {
+  background: var(--bg-dark) !important;
+  border: 1px solid var(--border-medium) !important;
+}
+
+.popover-title {
+  background: var(--bg-medium) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-dark) !important;
+}
+
+.popover-content {
+  color: var(--text-primary) !important;
+}
+
+/* ========================================================================
+ * Widgets
+ * ======================================================================== */
+.widget,
+.widget-box {
+  background: var(--bg-dark) !important;
+  border: 1px solid var(--border-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+.widget-header,
+.widget-title {
+  background: var(--bg-medium) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-dark) !important;
+}
+
+.widget-header h3,
+.widget-header h4,
+.widget-title h3,
+.widget-title h4 {
+  color: var(--text-primary) !important;
+}
+
+.widget-header span,
+.widget-title span {
+  color: var(--text-primary) !important;
+}
+
+.widget-header i,
+.widget-title i {
+  color: var(--accent-primary) !important;
+}
+
+.widget-content,
+.widget-body {
+  background: var(--bg-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+.widget-inbox-list li {
+  border-bottom: 1px dashed var(--border-dark) !important;
+}
+
+/* ========================================================================
+ * Content Boxes
+ * ======================================================================== */
+.content-box,
+.content-box-bordered {
+  background: var(--bg-dark) !important;
+  border: 1px solid var(--border-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+.content-box-header {
+  background: var(--bg-medium) !important;
+  border-bottom: 1px solid var(--border-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ========================================================================
+ * DataTables
+ * ======================================================================== */
+.dataTables_wrapper {
+  color: var(--text-primary) !important;
+}
+
+.dataTables_filter input {
+  background: var(--bg-light) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-medium) !important;
+}
+
+.dataTables_length select {
+  background: var(--bg-light) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-medium) !important;
+}
+
+.dataTables_info {
+  color: var(--text-secondary) !important;
+}
+
+.dataTables_paginate .paginate_button {
+  background: var(--bg-dark) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-dark) !important;
+}
+
+.dataTables_paginate .paginate_button:hover {
+  background: var(--bg-medium) !important;
+  color: var(--accent-light) !important;
+}
+
+.dataTables_paginate .paginate_button.current {
+  background: var(--accent-primary) !important;
+  color: white !important;
+}
+
+/* ========================================================================
+ * Custom Scrollbars
+ * ======================================================================== */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-lighter);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-light);
+}
+
+/* ========================================================================
+ * Typography Overrides
+ * ======================================================================== */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary) !important;
+}
+
+p {
+  color: var(--text-secondary) !important;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.text-primary {
+  color: var(--accent-light) !important;
+}
+
+.text-success {
+  color: #6ee7b7 !important;
+}
+
+.text-info {
+  color: #7dd3fc !important;
+}
+
+.text-warning {
+  color: #fbbf24 !important;
+}
+
+.text-danger {
+  color: #fca5a5 !important;
+}
+
+/* ========================================================================
+ * Background Helpers
+ * ======================================================================== */
+.bg-primary {
+  background: var(--accent-primary) !important;
+  color: white !important;
+}
+
+.bg-success {
+  background: var(--success-dark) !important;
+  color: white !important;
+}
+
+.bg-info {
+  background: var(--info-dark) !important;
+  color: white !important;
+}
+
+.bg-warning {
+  background: var(--warning-dark) !important;
+  color: white !important;
+}
+
+.bg-danger {
+  background: var(--danger-dark) !important;
+  color: white !important;
+}
+
+/* ========================================================================
+ * Miscellaneous
+ * ======================================================================== */
+code {
+  background: var(--bg-medium) !important;
+  color: var(--accent-light) !important;
+  border: 1px solid var(--border-dark) !important;
+}
+
+pre {
+  background: var(--bg-medium) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-dark) !important;
+}
+
+blockquote {
+  border-left: 4px solid var(--accent-primary) !important;
+  color: var(--text-secondary) !important;
+}
+
+.jumbotron {
+  background: var(--bg-medium) !important;
+  color: var(--text-primary) !important;
+}
+
+.thumbnail {
+  background: var(--bg-dark) !important;
+  border: 1px solid var(--border-dark) !important;
+}
+
+/* ========================================================================
+ * Login & Auth Pages
+ * ======================================================================== */
+.login-container,
+.auth-container {
+  background: var(--bg-darkest) !important;
+}
+
+.login-box,
+.auth-box,
+.box-with-help {
+  background: var(--bg-dark) !important;
+  border: 1px solid var(--border-dark) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+  padding: 30px !important;
+}
+
+.login-box h1,
+.auth-box h1 {
+  color: var(--text-primary) !important;
+  margin-bottom: 20px !important;
+}
+
+.login-header,
+.auth-header {
+  background: var(--bg-medium) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Login Copytext */
+.login-copytext {
+  color: var(--text-secondary) !important;
+}
+
+.login-copytext h2 {
+  color: var(--text-primary) !important;
+  margin-bottom: 15px !important;
+}
+
+.login-copytext p {
+  color: var(--text-secondary) !important;
+  line-height: 1.6 !important;
+}
+
+/* Page Login */
+.page-login {
+  background: var(--bg-darkest) !important;
+}
+
+/* ========================================================================
+ * Dashboard Specific
+ * ======================================================================== */
+.dashboard-stat {
+  background: var(--bg-dark) !important;
+  border: 1px solid var(--border-dark) !important;
+  color: var(--text-primary) !important;
+}
+
+.stat-icon {
+  color: var(--accent-primary) !important;
+}
+
+/* ========================================================================
+ * Footer
+ * ======================================================================== */
+.page-footer {
+  background-color: var(--bg-dark) !important;
+  border-top: 1px solid var(--border-dark) !important;
+  color: var(--text-secondary) !important;
+}
+
+.footer-content {
+  color: var(--text-secondary) !important;
+}
+
+.footer-item {
+  color: var(--text-secondary) !important;
+}
+
+.footer-item a {
+  color: var(--accent-light) !important;
+}
+
+.footer-item a:hover {
+  color: var(--accent-secondary) !important;
+}
+
+.footer-divider {
+  color: var(--border-medium) !important;
+}
+
+/* ========================================================================
+ * Print Media - Keep Light
+ * ======================================================================== */
+@media print {
+  body,
+  .panel,
+  .table,
+  .modal-content {
+    background: white !important;
+    color: black !important;
+  }
+}

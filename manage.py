@@ -3,16 +3,11 @@
 
 import os
 import sys
-from pathlib import Path
 
 
 def main():
     """Run administrative tasks."""
-    # Add src to sys.path
-    base_dir = Path(__file__).resolve().parent
-    sys.path.append(str(base_dir / "src"))
-
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "insecure_banking.settings")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

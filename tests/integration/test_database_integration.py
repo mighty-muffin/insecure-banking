@@ -30,7 +30,9 @@ from django.db import transaction, connection
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
 
-from web.models import Account, CashAccount, CreditAccount, Transfer, Transaction
+from apps.accounts.models import Account
+from apps.banking.models import CashAccount, CreditAccount, Transaction
+from apps.transfers.models import Transfer
 from web.services import (
     AccountService, CashAccountService, CreditAccountService,
     TransferService, ActivityService

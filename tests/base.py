@@ -25,7 +25,7 @@ class BaseTestCase(TestCase):
 
     def create_test_account(self, user=None, **overrides):
         """Create a test account in database."""
-        from web.models import Account
+        from apps.accounts.models import Account
 
         if user is None:
             user = self.create_test_user()
@@ -38,7 +38,7 @@ class BaseTestCase(TestCase):
 
     def create_test_transaction(self, account=None, **overrides):
         """Create a test transaction in database."""
-        from web.models import Transaction
+        from apps.banking.models import Transaction
 
         if account is None:
             account = self.create_test_account()
@@ -112,7 +112,7 @@ class BaseIntegrationTestCase(TransactionTestCase):
 
     def create_test_account(self, user=None, **overrides):
         """Create test account for integration testing."""
-        from web.models import Account
+        from apps.accounts.models import Account
 
         if user is None:
             user = self.users[0]
@@ -124,7 +124,7 @@ class BaseIntegrationTestCase(TransactionTestCase):
 
     def create_test_transaction(self, account=None, **overrides):
         """Create test transaction for integration testing."""
-        from web.models import Transaction
+        from apps.banking.models import Transaction
 
         if account is None:
             account = self.accounts[0]

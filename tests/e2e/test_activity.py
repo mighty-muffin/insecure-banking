@@ -2,7 +2,7 @@ import os
 import pytest
 from datetime import datetime
 from playwright.sync_api import Page, expect
-from web.models import CashAccount, Transaction
+from apps.banking.models import CashAccount, Transaction
 from tests.e2e.utils import login_user
 
 # Allow sync DB access in async context
