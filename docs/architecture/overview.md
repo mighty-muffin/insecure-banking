@@ -1,7 +1,5 @@
 # Architecture Overview
 
-## Project Structure
-
 The project follows Django's standard application structure with clear separation of concerns:
 
 ```bash
@@ -26,6 +24,8 @@ insecure-banking/
 ```
 
 ## Application Layers
+
+<!-- TODO : Improve this section -->
 
 ### Configuration Layer
 

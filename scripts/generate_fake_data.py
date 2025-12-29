@@ -42,7 +42,11 @@ def generate_accounts(fake: Faker, num_accounts: int = 7) -> List[Tuple]:
     accounts = []
     used_usernames = set()
 
-    # Always add Guillaume Bourbonnais as the first account with 'timinou'
+    # Always add John Doe as the first account with 'test'
+    accounts.append(('john', 'John', 'Doe', 'test'))
+    used_usernames.add('john')
+
+    # Always add Guillaume Bourbonnais as the second account with 'timinou'
     accounts.append(('guillaume', 'Guillaume', 'Bourbonnais', 'timinou'))
     used_usernames.add('guillaume')
 

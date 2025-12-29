@@ -1,7 +1,5 @@
 # Testing Overview
 
-## Test Structure
-
 The project includes a comprehensive test suite organized by test type:
 
 ```bash
@@ -34,6 +32,8 @@ uv run pytest -m unit             # Unit tests only
 ```
 
 ## Test Categories
+
+<!-- TODO : Improve this section -->
 
 ### Unit Tests
 
