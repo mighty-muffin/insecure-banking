@@ -3,51 +3,40 @@ site_name: Insecure Banking Documentation
 site_description: Documentation for the Insecure Banking application
 site_author: Mighty Muffin
 
+docs_dir: docs
+
 theme:
   name: material
+  palette:
+    scheme: slate
   features:
-    - navigation.tabs
+    # - navigation.tabs
     # - navigation.sections
-    - toc.integrated
+    # - toc.integrated
     - content.code.annotate
     - content.code.copy
 
-docs_dir: docs
+markdown_extensions:
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - footnotes:
 
 nav:
   - Home: README.md
   - Project Overview: project-overview.md
-  - Architecture:
-    - Overview: architecture/overview.md
-    - Authentication: architecture/authentication.md
-    - Database Schema: architecture/database-schema.md
-    - Django Framework: architecture/django-framework.md
-    - Middleware: architecture/middleware.md
-    - Models: architecture/models.md
-    - Security Vulnerabilities: architecture/security-vulnerabilities.md
-    - Services: architecture/services.md
-    - Views & URLs: architecture/views-urls.md
   - Development:
-    - Setup: development/setup.md
-    - Running: development/running.md
-    - Docker: development/docker.md
-    - Dependencies: development/dependencies.md
-    - Code Quality: development/code-quality.md
-    - Contributing: development/contributing.md
+      - Setup: development/setup.md
+      - Running: development/running.md
+      - Docker: development/docker.md
+      - Dependencies: development/dependencies.md
+      - Code Quality: development/quality.md
+      - Contributing: development/contributing.md
+  - Architecture:
+      - Overview: architecture/overview.md
+      - Database: architecture/db.md
+      - Middleware: architecture/middleware.md
   - Testing:
-    - Overview: testing/overview.md
-    - Configuration: testing/configuration.md
-    - Unit Tests: testing/unit-tests.md
-    - Integration Tests: testing/integration-tests.md
-    - Security Tests: testing/security-tests.md
-    - Structure: testing/structure.md
-  - Pipelines & CI/CD:
-    - Overview: pipelines/overview.md
-    - Main Workflow: pipelines/main-workflow.md
-    - PR Workflow: pipelines/pr-workflow.md
-    - Pre-Commit: pipelines/pre-commit.md
-    - Tag Workflow: pipelines/tag-workflow.md
+      - Overview: testing/overview.md
   - Security:
-    - Overview: security/overview.md
-    - Vulnerabilities: security/vulnerabilities.md
-    - Security Testing: security/security-testing.md
+      - Overview: security/overview.md
+      - Iditarod: security/iditarod.md

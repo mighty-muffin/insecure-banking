@@ -1,60 +1,69 @@
-# Contributing Guidelines
+# Contributing Guide
 
-## Getting Started
-
-1. Fork the repository
-2. Clone your fork
-3. Create a feature branch
-4. Make changes
-5. Run tests
-6. Submit pull request
+Before contributing, ensure you have completed the [Development Setup](setup.md) and can successfully run the application locally.
 
 ## Development Workflow
 
-Follow code style guidelines:
+1. Create a working Branch
 
-- Use ruff for formatting
-- Write tests for new code
-- Update documentation
+   ```bash
+   git checkout -b feature/your-feature-name
+   code .
+   ```
 
-```bash
-# Use conventional commits
-git checkout -b <type>/<your-changes>
-```
+2. Code Quality Checks
 
-### Run Quality Checks
+   ```bash
+   uv run pytest # Ensure all tests pass and code coverage is maintained (92%+)
+   pre-commit run --all-files # Run code quality checks using pre-commit
+   ```
 
-```bash
-# Format code
-uv run ruff format src/
-# Run linter
-uv run ruff check src/ --fix
-# Run tests
-uv run pytest
-# Run pre-commit
-pre-commit install --allow-missing-config
-pre-commit run --all-files
-```
+3. Commit Changes
 
-Then create pull request on GitHub.
+   ```bash
+   git add .
+   git commit -m "feat: add new transfer validation" # Write clear, descriptive commit messages
+   git push
+   ```
 
-## Code Standards
+## Coding Standards
 
-### Python Style
+### Conventional Commits
 
-- Follow PEP 8
-- Line length: 128 characters
-- Use type hints
-- Document functions
+- Use descriptive branch names:
+  - `feature/` for new features
+  - `bugfix/` for bug fixes
+  - `docs/` for documentation changes
+  - `refactor/` for code refactoring
 
-### Testing
+- Use conventional commit prefixes:
+  - `<type>(bump):` for any breakage (trigger major release)
+  - `feat:` for new features (trigger minor release)
+  - `fix:` for bug fixes (trigger patch release)
+  - `chore:` for maintenance tasks
+  - `docs:` for documentation
+  - `refactor:` for code refactoring
+  - `test:` for test additions or changes
 
-- Write tests for new features
-- Maintain 92% coverage
-- Use descriptive test names
+### Python Style Guide
 
-### Documentation
+- Follow PEP 8 style guidelines
+- Use type hints where appropriate
+- Maximum line length: 120 characters
+- Use descriptive variable and function names
 
-- Update relevant docs
-- Add docstrings
-- Keep README current
+### Testing Requirements
+
+- Write unit tests for new functions and methods
+- Add integration tests for new features
+- Maintain or improve code coverage
+- Test edge cases and error conditions
+
+## Code Review Process
+
+All contributions must go through code review:
+
+1. Create a pull request with a clear description
+2. Ensure all CI/CD checks pass
+3. Address reviewer feedback
+4. Obtain approval from at least one maintainer
