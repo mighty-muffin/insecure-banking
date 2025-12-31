@@ -1,54 +1,44 @@
+---
+hide:
+  - toc
+---
+
 # Insecure Banking Documentation
 
 ## Overview
 
 This documentation provides comprehensive information about the Insecure Banking application, a deliberately vulnerable Django-based web application designed for security testing and educational purposes.
 
-## Table of Contents
+**Technology Stack**:
 
-### Getting Started
+- **Framework**: Django 4.2.4
+- **Language**: Python 3.10+
+- **Database**: SQLite3
+- **Testing**: pytest, Playwright
+- **Code Quality**: Ruff, Bandit, Pre-commit
 
-- [Project Overview](project-overview.md)
-- [Development Setup](development/setup.md)
-- [Running the Application](development/running.md)
+## Quick Start
 
-### Architecture
+New to the project? Start here:
+
+1. [Project Overview](project-overview.md) - Understand what this project is about
+2. [Development Setup](development/setup.md) - Set up your local environment
+3. [Running the Application](development/running.md) - Start the application
+4. [Contributing Guide](development/contributing.md) - Learn how to contribute
+
+## Architecture
 
 - [Application Architecture](architecture/overview.md)
-- [Django Framework](architecture/django-framework.md)
-- [Database Schema](architecture/database-schema.md)
-- [Models](architecture/models.md)
-- [Views and URL Routing](architecture/views-urls.md)
-- [Services Layer](architecture/services.md)
-- [Middleware](architecture/middleware.md)
 
-### Security
-
-- [Security Vulnerabilities](architecture/security-vulnerabilities.md)
-- [Authentication and Authorization](architecture/authentication.md)
-
-### Testing
+## Testing
 
 - [Testing Overview](testing/overview.md)
-- [Test Structure](testing/structure.md)
-- [Unit Tests](testing/unit-tests.md)
-- [Integration Tests](testing/integration-tests.md)
-- [Security Tests](testing/security-tests.md)
-- [Test Configuration](testing/configuration.md)
 
-### CI/CD
+## Important Notice
 
-- [CI/CD Overview](cicd/overview.md)
-- [Main Branch Workflow](cicd/main-workflow.md)
-- [Pull Request Workflow](cicd/pr-workflow.md)
-- [Tag Workflow](cicd/tag-workflow.md)
-- [Pre-commit Hooks](cicd/pre-commit.md)
+This application contains intentional security vulnerabilities and should never be deployed to production or exposed to the internet. It is designed exclusively for controlled testing and educational purposes.
 
-### Development
-
-- [Dependency Management](development/dependencies.md)
-- [Docker Containerization](development/docker.md)
-- [Code Quality Tools](development/code-quality.md)
+- [Code Quality Tools](development/quality.md)
 - [Contributing Guidelines](development/contributing.md)
 
 ## Quick Reference

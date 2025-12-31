@@ -1,123 +1,32 @@
+---
+hide:
+  - toc
+---
 # Running the Application
 
-## Local Development
-
-### Start Development Server
+Start the Django development server:
 
 ```bash
-python src/manage.py runserver
+uv run python manage.py runserver
+run python manage.py runserver 0.0.0.0:8000 # Bind to specific IP:PORT
 ```
 
-Default: http://localhost:8000
+This command start the local dev-server:
 
-### Custom Port
+- The application will be available at [http://localhost:8000](http://localhost:8000).
+- Use the following credentials to log into the application:
+  - **Username**: john
+  - **Password**: test
+
+## Common Management Commands
 
 ```bash
-python src/manage.py runserver 8080
+uv run python manage.py migrate             # Apply database migrations
+uv run python manage.py makemigrations      # Create new migrations after model changes
+uv run python manage.py createsuperuser     # Create an administrative user for Django admin
+uv run python manage.py shell               # Access the Django interactive shell
 ```
 
-### All Interfaces
+### Access Django Admin
 
-```bash
-python src/manage.py runserver 0.0.0.0:8000
-```
-
-## Docker
-
-### Build Image
-
-```bash
-docker build \
-  --build-arg GIT_COMMIT=$(git rev-parse --short HEAD) \
-  --build-arg REPO_URL=$(git config --get remote.origin.url) \
-  --file Dockerfile \
-  --tag insecure-bank-py .
-```
-
-### Run Container
-
-```bash
-docker run -d \
-  --publish 8000:8000 \
-  --name insecure-bank-py \
-  insecure-bank-py
-```
-
-### View Logs
-
-```bash
-docker logs insecure-bank-py
-```
-
-### Stop Container
-
-```bash
-docker stop insecure-bank-py
-docker rm insecure-bank-py
-```
-
-## Default Credentials
-
-```text
-Username: john
-Password: test
-```
-
-## Available Pages
-
-- `/login` - Login page
-- `/dashboard` - Main dashboard
-- `/transfer` - Money transfer
-- `/activity` - Transaction history
-- `/admin` - Admin view
-- `/dashboard/userDetail` - User profile
-
-## Development Tools
-
-### Django Shell
-
-```bash
-python src/manage.py shell
-```
-
-### Database Shell
-
-```bash
-python src/manage.py dbshell
-```
-
-### Create Superuser
-
-```bash
-python src/manage.py createsuperuser
-```
-
-### Django Admin
-
-Access at: http://localhost:8000/admin/
-
-## Hot Reload
-
-Django development server automatically reloads on code changes.
-
-## Debugging
-
-### Enable Debug Mode
-
-In `src/config/settings.py`:
-```python
-DEBUG = True
-```
-
-### View SQL Queries
-
-```python
-from django.db import connection
-print(connection.queries)
-```
-
-## Related Documentation
-
-- [Development Setup](setup.md)
-- [Docker Containerization](docker.md)
-- [Testing](../testing/overview.md)
+The Django admin interface is available at [http://localhost:8000/admin](http://localhost:8000/admin).

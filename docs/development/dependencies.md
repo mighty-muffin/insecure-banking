@@ -1,57 +1,45 @@
+---
+hide:
+  - toc
+---
 # Dependency Management
 
-## UV Package Manager
+This project uses `uv` for Python package management and dependency resolution. Dependencies are defined in `pyproject.toml` and locked in `uv.lock`.
 
-The project uses [uv](https://github.com/astral-sh/uv) an extremely fast Python package and project manager, written in Rust.
+## Dependency Files
 
 ### pyproject.toml
 
-Main project configuration:
+The `pyproject.toml` file defines project metadata and dependencies:
 
-```toml
-[project]
-name = "insecure-python"
-version = "0.0.0"
-requires-python = ">=3.10"
-dependencies = [
-    "asgiref==3.7.2",
-    "django==4.2.4",
-    "pycryptodome==3.18.0",
-    "sqlparse==0.4.4",
-    "typing-extensions==4.7.1",
-]
-
-[dependency-groups]
-dev = [
-    "pytest>=8.4.2",
-    "pytest-django>=4.11.1",
-    "pytest-cov>=7.0.0",
-    "ruff>=0.14.4",
-    "pre-commit>=4.5.0",
-]
-```
+- **project.dependencies**: Production dependencies
+- **dependency-groups.dev**: Development dependencies
+- **dependency-groups.docs**: Documentation dependencies
 
 ### uv.lock
 
-Locked dependency versions for reproducible installs.
+The `uv.lock` file contains locked versions of all dependencies and their transitive dependencies, ensuring reproducible installations.
 
 ### requirements.txt
 
-Generated from uv.lock for compatibility.  There is also a `pre-commit` hooks to automate this task.
+The `requirements.txt` file is generated from `uv.lock` and contains only production dependencies for deployment.  This files is generated automatically via `pre-commit hooks` and simplify compatiblity with some systems that have yet to be compliant with `uv` dependencies management.
+
+> **_WARNING:_**  You should not edit the `requirements.txt` file, let the automation handle this file.
+
+If you ever need to generate the `requirements.txt` file manually; here how.
 
 ```bash
-uv export --frozen --output-file=requirements.txt
+uv export --no-dev --output-file requirements.txt
 ```
 
-## Managing Dependencies
+## Key Dependencies
 
-```bash
-uv add --dev pytest # Add dev dependency
-uv add django # Add to project
-uv lock --upgrade # Update all
-uv lock --upgrade-package django # Update specific package
-uv remove package-name # Remove Dependency
-uv sync --all-extras --dev --frozen # All dependencies
-uv sync --frozen # Production only
-uv sync --upgrade # Update dependencies
-```
+- **Django 4.2.4**: Web framework
+- **pycryptodome 3.18.0**: Cryptographic operations
+- **PyYAML 5.3.1**: YAML parsing
+- **sqlparse 0.4.2**: SQL parsing utilities
+
+### Documentation Dependencies
+
+- **mkdocs**: Documentation site generator
+- **mkdocs-material**: Material theme for mkdocs

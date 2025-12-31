@@ -1,49 +1,59 @@
-# Setting Up
+---
+hide:
+  - toc
+---
+# Development Setup
 
-Here's how to get the app running on your machine. It's pretty standard Python stuff!
+Before setting up the development environment, ensure you have the following installed:
 
-## What you need
+- Docker
+- Git
+- Python 3.10.x
+- uv
 
-- **Python 3.10+**
-- **uv** (It's a fast package manager we use)
-- **Git**
+## Installing package manager
 
-## Quick Start
+If you do not have `uv` installed, install it using the official installer:
 
-1. **Get the code:**
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
-    ```bash
-    git clone https://github.com/mighty-muffin/insecure-banking.git
-    cd insecure-banking
-    ```
+For other installation methods, refer to the [uv documentation](https://docs.astral.sh/uv/).
 
-2. **Install uv** (if you don't have it):
+### Virtual Environment
 
-    ```bash
-    # Mac/Linux
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    # Windows
-    powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-    ```
+Create and activate a virtual environment using uv:
 
-3. **Set up the environment:**
+```bash
+uv venv .venv --python 3.10
+source .venv/bin/activate
+uv sync --all-extras --dev --frozen
+uv sync --group docs  # If you want to create the documentation
+```
 
-    ```bash
-    uv venv .venv --python 3.10
-    source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
-    ```
+This command will:
 
-4. **Install dependencies:**
+- Install all production dependencies
+- Install development dependencies (testing, linting, etc.)
+- Install documentation dependencies (mkdocs, mkdocs-material)
+- Lock dependencies to ensure reproducible builds
 
-    ```bash
-    uv sync --all-extras --dev --frozen
-    ```
+## Database Setup
 
-5. **Run it!**
+Initialize the database with migrations:
 
-    ```bash
-    python src/manage.py migrate
-    python src/manage.py runserver
-    ```
+```bash
+uv run python manage.py migrate
+uv run python manage.py check
+```
 
-That's it! Go to `http://127.0.0.1:8000` and start hacking.
+This command will:
+
+- This will create the SQLite database file (`db.sqlite3`) and apply all migrations to set up the database schema.
+- Verify that the installation was successful by running.
+- This command checks for any issues with your Django project configuration.
+
+## Next Steps
+
+After completing the setup, proceed to [Running the Application](running.md) to start the development server.
