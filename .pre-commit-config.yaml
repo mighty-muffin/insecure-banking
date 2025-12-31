@@ -21,8 +21,15 @@ repos:
         name: "meta | pre-commit hooks"
         stages:
           - manual
+  - repo: https://github.com/gitguardian/ggshield
+    rev: v1.46.0
+    hooks:
+      - id: ggshield
+        name: "security | ggshield: scan for secrets"
+        stages:
+          - manual
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.10.1
+    rev: v4.11.0
     hooks:
       - id: commitizen
         name: "commitizen | validate commit messages"
@@ -76,7 +83,7 @@ repos:
           (?x)
           ^mkdocs.yml
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.18
+    rev: 0.9.21
     hooks:
       - id: uv-export
         name: "python | uv: export dependencies"
@@ -111,16 +118,3 @@ repos:
         language: system
         types: [python]
         pass_filenames: false
-  - repo: local
-    hooks:
-      - id: pin-github-action
-        name: "security | gh-action: pinned sha"
-        verbose: true
-        files: ^\.github/workflows/[^/]+\.ya?ml$
-        entry: |
-          "pin-github-action ."
-        language: node
-        additional_dependencies:
-          - pin-github-action@3.4.0
-        stages:
-          - manual
