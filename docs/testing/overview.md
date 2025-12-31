@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # Testing Overview
 
 The project includes a comprehensive test suite organized by test type:
@@ -10,6 +15,8 @@ tests/
 └── unit/              # Unit tests for individual components
 ```
 
+This project use [pytest-xdist](https://github.com/pytest-dev/pytest-xdist); a pytest plugin for distributed testing and loop-on-failures testing modes.  `pytest-xdist` shards your test suite on all available CPU core for faster performances.  Sometimes it can generates flaky test but its pretty rare.  Just re-run the test and you are good.
+
 ## Running Tests
 
 Execute the complete test suite:
@@ -19,8 +26,6 @@ uv run pytest                               # Run the whole test suite
 uv run pytest tests/unit/test_models.py     # Run a single test file
 uv run pytest --cov=src --cov-report=html   # Generate code coverage reports
 ```
-
-### Run Specific Test Suites
 
 Run tests by category:
 
@@ -35,46 +40,30 @@ uv run pytest -m unit             # Unit tests only
 
 <!-- TODO : Improve this section -->
 
-### Unit Tests
+**Unit Tests** validate individual functions and methods in isolation:
 
-Unit tests validate individual functions and methods in isolation:
+- test_context_processors.py: Tests for template context processors
+- test_models.py: Tests for database models
+- test_services.py: Tests for service layer functions
+- test_views.py: Tests for view functions
 
-- **test_context_processors.py**: Tests for template context processors
-- **test_models.py**: Tests for database models
-- **test_services.py**: Tests for service layer functions
-- **test_views.py**: Tests for view functions
+**Integration Tests** validate interactions between components:
 
-Unit tests use mocking to isolate components and run quickly.
+- test_admin_flow.py: Administrative function tests
+- test_auth_flow.py: Authentication workflow tests
+- test_database_integration.py: Database operation tests
+- test_transfer_flow.py: Transfer process tests
 
-### Integration Tests
+**End-to-end tests** use Playwright to simulate user interactions:
 
-Integration tests validate interactions between components:
+- test_activity.py: Activity viewing tests
+- test_login.py: Login functionality tests
+- test_logout.py: Logout functionality tests
+- test_transfer.py: Transfer workflow tests
 
-- **test_admin_flow.py**: Administrative function tests
-- **test_auth_flow.py**: Authentication workflow tests
-- **test_database_integration.py**: Database operation tests
-- **test_transfer_flow.py**: Transfer process tests
+**Security tests** validate the presence of intentional vulnerabilities:
 
-Integration tests use a test database and validate complete workflows.
-
-### Security Tests
-
-Security tests validate the presence of intentional vulnerabilities:
-
-- **test_command_injection.py**: Command injection tests
-- **test_crypto_weaknesses.py**: Cryptographic weakness tests
-- **test_deserialization.py**: Unsafe deserialization tests
-- **test_sql_injection.py**: SQL injection vulnerability tests
-
-These tests ensure vulnerabilities remain present for educational purposes.
-
-### End-to-End Tests
-
-End-to-end tests use Playwright to simulate user interactions:
-
-- **test_activity.py**: Activity viewing tests
-- **test_login.py**: Login functionality tests
-- **test_logout.py**: Logout functionality tests
-- **test_transfer.py**: Transfer workflow tests
-
-E2E tests require the application to be running and validate the complete user experience.
+- test_command_injection.py: Command injection tests
+- test_crypto_weaknesses.py: Cryptographic weakness tests
+- test_deserialization.py: Unsafe deserialization tests
+- test_sql_injection.py: SQL injection vulnerability tests

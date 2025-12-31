@@ -1,4 +1,8 @@
-# Code Quality Tools
+---
+hide:
+  - toc
+---
+# Code Quality
 
 Code quality is the measure of how reliable, efficient, readable, and maintainable software code is, encompassing its ability to function correctly, be understood, modified, and extended easily by developers while meeting user needs and security standards. It's about more than just being bug-free; high-quality code is well-structured, performant, testable, and adheres to best practices, making it a valuable asset rather than a liability.
 
@@ -29,8 +33,6 @@ uv run pytest --cov=src # With coverage
 uv run pytest -m unit # Specific marker
 ```
 
-> **_NOTE:_**  There is a single flaky test that seems to be failing 1% of the time.
-
 ## Ruff
 
 [ruff](https://github.com/astral-sh/ruff); an extremely fast Python linter and code formatter, written in Rust.
@@ -41,6 +43,8 @@ uv run ruff check --fix # Fix issues
 uv run ruff format # Format code
 ```
 
+> **_ERROR:_**  `ruff` is not really implemented yet so.. do not run it
+
 ## Ty
 
 [ty](https://github.com/astral-sh/ty); an extremely fast Python type checker and language server, written in Rust.
@@ -48,6 +52,8 @@ uv run ruff format # Format code
 ```bash
 uv run ty check src/ # Check code
 ```
+
+> **_ERROR:_**  `ty` is not really implemented yet so.. do not run it
 
 ## Code Style Guidelines
 
@@ -58,16 +64,6 @@ uv run ty check src/ # Check code
 - Add trailing commas in multi-line data structures
 - Follow PEP 8 conventions
 
-### Import Organization
-
-Imports are organized in three groups:
-
-1. Standard library imports
-2. Third-party package imports
-3. Local application imports
-
-Ruff automatically sorts imports within these groups.
-
 ### Docstrings
 
 Use docstrings for:
@@ -77,31 +73,6 @@ Use docstrings for:
 - Public functions and methods
 
 Follow Google or NumPy docstring style conventions.
-
-## Handling Code Quality Issues
-
-### Fixing Automatically
-
-Many issues can be fixed automatically:
-
-```bash
-ruff check --fix .
-ruff format .
-```
-
-### Disabling Specific Checks
-
-If a rule must be disabled for a specific line:
-
-```python
-result = eval(user_input)  # noqa: S307
-```
-
-Only disable checks when absolutely necessary and document the reason.
-
-### Ignoring Files
-
-Add files to ignore patterns in configuration files rather than using inline comments when possible.
 
 ## CI/CD Integration
 

@@ -1,3 +1,7 @@
+---
+hide:
+  - toc
+---
 # Docker Deployment
 
 Ensure Docker is installed on your system. Verify installation:

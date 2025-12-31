@@ -1,8 +1,21 @@
+---
+hide:
+  - toc
+---
+
 # Insecure Banking Documentation
 
 ## Overview
 
 This documentation provides comprehensive information about the Insecure Banking application, a deliberately vulnerable Django-based web application designed for security testing and educational purposes.
+
+**Technology Stack**:
+
+- **Framework**: Django 4.2.4
+- **Language**: Python 3.10+
+- **Database**: SQLite3
+- **Testing**: pytest, Playwright
+- **Code Quality**: Ruff, Bandit, Pre-commit
 
 ## Quick Start
 
@@ -13,42 +26,19 @@ New to the project? Start here:
 3. [Running the Application](development/running.md) - Start the application
 4. [Contributing Guide](development/contributing.md) - Learn how to contribute
 
-## Documentation Sections
-
-### Getting Started
-
-- [Project Overview](project-overview.md)
-- [Development Setup](development/setup.md)
-- [Running the Application](development/running.md)
-- [Docker Deployment](development/docker.md)
-
-### Development
-
-- [Contributing Guide](development/contributing.md)
-- [Dependency Management](development/dependencies.md)
-- [Code Quality](development/code-quality.md)
-
-### Architecture
+## Architecture
 
 - [Application Architecture](architecture/overview.md)
 
-### Testing
+## Testing
 
 - [Testing Overview](testing/overview.md)
-
-## Technology Stack
-
-- **Framework**: Django 4.2.4
-- **Language**: Python 3.10+
-- **Database**: SQLite3
-- **Testing**: pytest, Playwright
-- **Code Quality**: Ruff, Bandit, Pre-commit
 
 ## Important Notice
 
 This application contains intentional security vulnerabilities and should never be deployed to production or exposed to the internet. It is designed exclusively for controlled testing and educational purposes.
 
-- [Code Quality Tools](development/code-quality.md)
+- [Code Quality Tools](development/quality.md)
 - [Contributing Guidelines](development/contributing.md)
 
 ## Quick Reference

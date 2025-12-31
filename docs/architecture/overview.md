@@ -1,26 +1,27 @@
+---
+hide:
+  - toc
+---
 # Architecture Overview
 
 The project follows Django's standard application structure with clear separation of concerns:
 
 ```bash
 insecure-banking/
-├── db.sqlite3            # SQLite database file
 ├── Dockerfile            # Docker container definition
 ├── manage.py             # Django management script
-├── mkdocs.yml            # Documentation configuration
 ├── pyproject.toml        # Project metadata and dependencies
-├── requirements.txt      # Production dependencies
 ├── docs/                 # Documentation
-├─ scripts/               # Utility scripts
+├── scripts/              # Utility scripts
 ├── src/                  # Application source code
 │   ├── config/           # Django project configuration
 │   ├── data/             # Data handling utilities
 │   └── web/              # Main web application
 └──tests/                 # Test suite
-    ├── unit/             # Unit tests
+    ├── e2e/              # End-to-end tests
     ├── integration/      # Integration tests
     ├── security/         # Security tests
-    └── e2e/              # End-to-end tests
+    └── unit/             # Unit tests
 ```
 
 ## Application Layers
@@ -98,38 +99,3 @@ Static assets in `src/web/static/` include:
 - Custom CSS for styling
 - JavaScript for interactivity
 - Images and fonts
-
-## Database Architecture
-
-The application uses SQLite for simplicity. The schema includes:
-
-- Users table for authentication
-- Accounts table for bank accounts
-- Operations table for transactions
-
-Foreign key relationships maintain referential integrity between tables.
-
-## Middleware Stack
-
-Custom middleware in `src/config/middleware.py` handles:
-
-- Authentication requirements
-- Request/response processing
-- Security headers
-
-## Testing Architecture
-
-Tests are organized by type:
-
-- **Unit tests**: Test individual functions and methods in isolation
-- **Integration tests**: Test component interactions
-- **Security tests**: Test for known vulnerabilities
-- **End-to-end tests**: Test complete user workflows using Playwright
-
-## Deployment Architecture
-
-The application can be deployed:
-
-- Locally using Django development server
-- In containers using Docker
-- Behind a reverse proxy in production environments

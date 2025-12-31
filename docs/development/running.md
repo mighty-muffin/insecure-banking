@@ -1,3 +1,7 @@
+---
+hide:
+  - toc
+---
 # Running the Application
 
 Start the Django development server:

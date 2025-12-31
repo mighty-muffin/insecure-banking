@@ -1,3 +1,7 @@
+---
+hide:
+  - toc
+---
 # Dependency Management
 
 This project uses `uv` for Python package management and dependency resolution. Dependencies are defined in `pyproject.toml` and locked in `uv.lock`.
