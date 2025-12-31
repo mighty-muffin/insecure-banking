@@ -19,7 +19,7 @@ The project is for educational purposes.  These are the instructions for the upc
 
 - [ ] Fork the [insecure-banking](https://github.com/mighty-muffin/insecure-banking) with all branches
 - [ ] Read the project documentation
-- [ ] Y
+- [ ] Check if you
 
 ## Stage
 
