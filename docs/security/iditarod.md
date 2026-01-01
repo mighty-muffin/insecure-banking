@@ -22,7 +22,7 @@ The project is for educational purposes.  These are the instructions for the upc
 - [ ] Verify everything works
 - [ ] Run `make all` from the `Makefile` file is available
 
-## Stage
+## Scenario
 
 **SLDC Check (5-10min)**:
 
@@ -63,7 +63,9 @@ def get_file_checksum(data: bytes) -> str:
     return base64.b64encode(encrypted).decode("UTF-8")
 ```
 
-The [Data Encryption Standard (DES](https://en.wikipedia.org/wiki/Data_Encryption_Standard) was officially withdrawn from the NIST recommendation (May 19, 2005), because it no longer provided adequate security (vulnerable to brute-force attacks) and has been replaced by stronger algorithms like the Advanced Encryption Standard (AES).
+The [Data Encryption Standard (DES](https://en.wikipedia.org/wiki/Data_Encryption_Standard) was officially withdrawn from the NIST recommendation (May 19, 2005), because it no longer provided adequate security (vulnerable to brute-force attacks).  This is an obvious exemple of [CWE-327: Use of a Broken or Risky Cryptographic Algorithm](https://cwe.mitre.org/data/definitions/327.html) which is a typical issue popularized with the [OWASP Top Ten 2025 Category A04:2025 - Cryptographic Failures](https://owasp.org/Top10/2025/A04_2025-Cryptographic_Failures/).
+
+ and has been replaced by stronger algorithms like the Advanced Encryption Standard (AES).
 
 Demonstrate how your platorm can scan (local & [`branch.yml`](.github/workflows/branch.yml) workflow) and find this issues while providing guidance toward resolution.  Showcase how your platform provide assistance to the end user to resolved this issue.
 
